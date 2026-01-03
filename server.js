@@ -12,8 +12,6 @@ const Vehicle = require('./models/Vehicle');
 const ServiceRecord = require('./models/ServiceRecord');
 const Expense = require('./models/Expense');
 const RecurringExpense = require('./models/RecurringExpense');
-const Expense = require('./models/Expense');
-const RecurringExpense = require('./models/RecurringExpense');
 
 const app = express();
 
