@@ -142,9 +142,21 @@ app.delete('/api/vehicles/:id', async (req, res) => {
 
 app.post('/api/services', async (req, res) => {
     const { _id, vehiclePlate, status } = req.body;
+
+    // Prevent Phantom Vehicles
+    if (!vehiclePlate || vehiclePlate.trim() === '') {
+        return res.status(400).json({ error: 'Missing Plate' });
+    }
+
+    let updateData = { ...req.body };
+    // Fix Mini ERP: Set date when completed
+    if (status === 'Completed') {
+        updateData.completedAt = new Date();
+    }
+
     let record;
-    if (_id) { record = await ServiceRecord.findByIdAndUpdate(_id, req.body, { new: true }); }
-    else { record = await ServiceRecord.create(req.body); }
+    if (_id) { record = await ServiceRecord.findByIdAndUpdate(_id, updateData, { new: true }); }
+    else { record = await ServiceRecord.create(updateData); }
 
     // Auto-create/Update Vehicle
     if (status === 'Completed') {
