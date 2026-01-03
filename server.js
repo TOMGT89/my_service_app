@@ -170,6 +170,19 @@ app.delete('/api/recurring-expenses/:id', async (req, res) => { try { await Recu
 app.get('/api/services/completed', async (req, res) => res.json(await ServiceRecord.find({ status: 'Completed' }).sort({ completedAt: -1 })));
 app.get('/api/services', async (req, res) => { try { res.json(await ServiceRecord.find().sort({ date: -1 })); } catch (e) { res.status(500).json({ error: 'Error' }); } });
 
+// --- PUBLIC ROUTES (Client Book) ---
+app.get('/api/public/book/:plate', async (req, res) => {
+    try {
+        const vehicle = await Vehicle.findOne({ plateNumber: req.params.plate }).lean();
+        if (!vehicle) return res.status(404).json({ error: 'Vehicle not found' });
+
+        const services = await ServiceRecord.find({ vehiclePlate: req.params.plate, status: 'Completed' }).sort({ date: -1 });
+        const user = await User.findOne({ role: 'admin' }); // Get shop info
+
+        res.json({ vehicle, services, shop: user ? { shopName: user.shopName, phones: user.phones, warning: 'Next Service Soon' } : {} });
+    } catch (e) { res.status(500).json({ error: 'Error' }); }
+});
+
 // --- STATIC FILES (EMPLOYEE APP & CLIENT BOOK) ---
 
 // Use path.resolve to get an absolute path that Windows handles better
