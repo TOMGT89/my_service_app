@@ -12,6 +12,8 @@ const Vehicle = require('./models/Vehicle');
 const ServiceRecord = require('./models/ServiceRecord');
 const Expense = require('./models/Expense');
 const RecurringExpense = require('./models/RecurringExpense');
+const Expense = require('./models/Expense');
+const RecurringExpense = require('./models/RecurringExpense');
 
 const app = express();
 
@@ -150,6 +152,25 @@ app.post('/api/services', async (req, res) => {
 });
 
 app.get('/api/services/pending', async (req, res) => res.json(await ServiceRecord.find({ status: 'Pending' })));
+
+// MISSING ROUTES ADDED
+app.post('/api/users', async (req, res) => { try { res.json(await User.create(req.body)); } catch (e) { res.status(500).json({ error: 'Error' }); } });
+app.put('/api/users/:id', async (req, res) => { try { res.json(await User.findByIdAndUpdate(req.params.id, req.body, { new: true })); } catch (e) { res.status(500).json({ error: 'Error' }); } });
+app.delete('/api/users/:id', async (req, res) => { try { await User.findByIdAndDelete(req.params.id); res.json({ success: true }); } catch (e) { res.status(500).json({ error: 'Error' }); } });
+
+// --- MINI ERP ROUTES ---
+app.get('/api/expenses', async (req, res) => res.json(await Expense.find().sort({ date: -1 })));
+app.post('/api/expenses', async (req, res) => { try { res.json(await Expense.create(req.body)); } catch (e) { res.status(500).json({ error: 'Error' }); } });
+app.put('/api/expenses/:id', async (req, res) => { try { res.json(await Expense.findByIdAndUpdate(req.params.id, req.body, { new: true })); } catch (e) { res.status(500).json({ error: 'Error' }); } });
+app.delete('/api/expenses/:id', async (req, res) => { try { await Expense.findByIdAndDelete(req.params.id); res.json({ success: true }); } catch (e) { res.status(500).json({ error: 'Error' }); } });
+
+app.get('/api/recurring-expenses', async (req, res) => res.json(await RecurringExpense.find()));
+app.post('/api/recurring-expenses', async (req, res) => { try { res.json(await RecurringExpense.create(req.body)); } catch (e) { res.status(500).json({ error: 'Error' }); } });
+app.put('/api/recurring-expenses/:id', async (req, res) => { try { res.json(await RecurringExpense.findByIdAndUpdate(req.params.id, req.body, { new: true })); } catch (e) { res.status(500).json({ error: 'Error' }); } });
+app.delete('/api/recurring-expenses/:id', async (req, res) => { try { await RecurringExpense.findByIdAndDelete(req.params.id); res.json({ success: true }); } catch (e) { res.status(500).json({ error: 'Error' }); } });
+
+app.get('/api/services/completed', async (req, res) => res.json(await ServiceRecord.find({ status: 'Completed' }).sort({ completedAt: -1 })));
+app.get('/api/services', async (req, res) => { try { res.json(await ServiceRecord.find().sort({ date: -1 })); } catch (e) { res.status(500).json({ error: 'Error' }); } });
 
 // --- STATIC FILES (EMPLOYEE APP & CLIENT BOOK) ---
 
