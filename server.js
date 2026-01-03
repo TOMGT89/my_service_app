@@ -145,7 +145,29 @@ app.post('/api/services', async (req, res) => {
     let record;
     if (_id) { record = await ServiceRecord.findByIdAndUpdate(_id, req.body, { new: true }); }
     else { record = await ServiceRecord.create(req.body); }
-    if (status === 'Completed') await Vehicle.findOneAndUpdate({ plateNumber: vehiclePlate }, { lastService: Date.now() });
+
+    // Auto-create/Update Vehicle
+    if (status === 'Completed') {
+        await Vehicle.findOneAndUpdate(
+            { plateNumber: vehiclePlate },
+            {
+                $set: { plateNumber: vehiclePlate, lastService: Date.now() },
+                $setOnInsert: { brand: 'Unknown', model: 'Unknown', ownerName: 'Unknown', ownerPhone: '' } // Default values for new cars
+            },
+            { upsert: true, new: true }
+        );
+    } else {
+        // Even if Pending, ensure vehicle exists so Admin sees it in the list to manage it
+        await Vehicle.findOneAndUpdate(
+            { plateNumber: vehiclePlate },
+            {
+                $set: { plateNumber: vehiclePlate },
+                $setOnInsert: { brand: 'Unknown', model: 'Unknown', ownerName: 'Unknown', ownerPhone: '' }
+            },
+            { upsert: true, new: true }
+        );
+    }
+
     res.json(record);
 });
 
