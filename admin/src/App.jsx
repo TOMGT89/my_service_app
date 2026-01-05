@@ -553,6 +553,31 @@ const SettingsTab = ({ user, setUser, theme }) => {
         }
     };
 
+    // IMAGE RESIZER UTILITY
+    const resizeImage = (file, maxWidth = 300) => {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ratio = maxWidth / img.width;
+                    if (ratio >= 1) { resolve(file); return; } // No resizing needed
+
+                    canvas.width = maxWidth;
+                    canvas.height = img.height * ratio;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    canvas.toBlob((blob) => {
+                        resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
+                    }, 'image/jpeg', 0.8); // 80% Quality
+                };
+            };
+        });
+    };
+
     const handleAddPhone = (e) => { e.preventDefault(); if (newPhone) { setPhones([...phones, newPhone]); setNewPhone(''); } };
     const removePhone = (idx) => setPhones(phones.filter((_, i) => i !== idx));
 
@@ -561,12 +586,23 @@ const SettingsTab = ({ user, setUser, theme }) => {
         formData.append('shopName', name);
         formData.append('website', website);
         formData.append('phones', JSON.stringify(phones));
-        formData.append('theme', selectedTheme); // Save Theme
+        formData.append('theme', selectedTheme);
 
-        if (logoFile) formData.append('logo', logoFile);
-        if (stampFile) formData.append('stamp', stampFile);
+        if (logoFile) {
+            const resized = await resizeImage(logoFile, 400); // Resize to 400px width
+            formData.append('logo', resized);
+        }
+        if (stampFile) {
+            const resized = await resizeImage(stampFile, 400);
+            formData.append('stamp', resized);
+        }
 
-        const res = await fetch(`${API_URL}/api/settings/${user._id}`, { method: 'PUT', body: formData });
+        const res = await fetch(`${API_URL}/api/settings/${user._id}`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+            body: formData
+        });
+
         if (res.ok) { setUser(await res.json()); alert('✅ Αποθηκεύτηκαν!'); } else alert('❌ Σφάλμα');
     };
 
@@ -579,14 +615,17 @@ const SettingsTab = ({ user, setUser, theme }) => {
         formData.append('phones', JSON.stringify([]));
         formData.append('clearLogo', 'true');
         formData.append('clearStamp', 'true');
-        formData.append('theme', 'default'); // Reset theme
+        formData.append('theme', 'default');
 
         try {
-            const res = await fetch(`${API_URL}/api/settings/${user._id}`, { method: 'PUT', body: formData });
+            const res = await fetch(`${API_URL}/api/settings/${user._id}`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                body: formData
+            });
             if (res.ok) {
                 const updated = await res.json();
                 setUser(updated);
-                // Update local state
                 setName('New Shop');
                 setWebsite('');
                 setPhones([]);
