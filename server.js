@@ -211,9 +211,13 @@ app.post('/api/admin/shops', authMiddleware, async (req, res) => {
 
         // 2. Create Admin User for Shop
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(adminUser.password, salt);
+        // Robustness: Trim Admin Inputs
+        const adminUsername = adminUser.username.trim();
+        const adminPassword = adminUser.password.trim();
+
+        const hashedPassword = await bcrypt.hash(adminPassword, salt);
         await User.create({
-            username: adminUser.username,
+            username: adminUsername,
             password: hashedPassword, // Manual hash since we might bypass pre-save or want explicit control
             role: 'admin',
             shop: shop._id,
@@ -229,7 +233,11 @@ app.delete('/api/admin/shops/:id', authMiddleware, async (req, res) => {
         if (req.user.role !== 'superadmin') return res.status(403).json({ error: 'Access Denied' });
         const shopId = req.params.id;
 
-        // 1. Delete Shop
+        // 1. Delete Shop protection
+        const shop = await Shop.findById(shopId);
+        if (!shop) return res.status(404).json({ error: 'Shop not found' });
+        if (shop.isSuperAdmin) return res.status(403).json({ error: 'Cannot delete Super Admin Shop' });
+
         await Shop.findByIdAndDelete(shopId);
 
         // 2. Delete Users of this Shop

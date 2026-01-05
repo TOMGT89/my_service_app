@@ -813,6 +813,8 @@ const SuperAdminTab = ({ theme }) => {
         } catch (e) { alert('Error'); }
     };
 
+    const handleInput = (key, value) => setNewShop(prev => ({ ...prev, [key]: value }));
+
     return (
         <div className="space-y-8">
             <h2 className="text-2xl font-bold text-white flex items-center gap-2"><LayoutDashboard className="text-purple-500" /> Διαχείριση Συνδρομητών (SaaS)</h2>
@@ -821,15 +823,44 @@ const SuperAdminTab = ({ theme }) => {
             <div className={`${t.card} p-6 rounded-xl border ${t.border} space-y-4`}>
                 <h3 className="font-bold text-slate-300 border-b border-slate-700 pb-2">➕ Νέο Συνεργείο</h3>
                 <form onSubmit={handleCreateShop} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input placeholder="Όνομα Συνεργείου" value={newShop.name} onChange={e => setNewShop({ ...newShop, name: e.target.value })} className={`${t.input} border ${t.border} text-white p-3 rounded-lg`} required />
-                    <input placeholder="Email (Username)" value={newShop.email} onChange={e => setNewShop({ ...newShop, email: e.target.value })} className={`${t.input} border ${t.border} text-white p-3 rounded-lg`} required />
-                    <input placeholder="Κωδικός Πρόσβασης" value={newShop.password} onChange={e => setNewShop({ ...newShop, password: e.target.value })} className={`${t.input} border ${t.border} text-white p-3 rounded-lg`} required />
-                    <select value={newShop.plan} onChange={e => setNewShop({ ...newShop, plan: e.target.value })} className={`${t.input} border ${t.border} text-white p-3 rounded-lg`}>
+                    <input
+                        placeholder="Όνομα Συνεργείου"
+                        value={newShop.name || ''}
+                        onChange={e => handleInput('name', e.target.value)}
+                        className={`${t.input} border ${t.border} text-white p-3 rounded-lg`}
+                        autoComplete="off"
+                        required
+                    />
+                    <input
+                        placeholder="Email (Username)"
+                        value={newShop.email || ''}
+                        onChange={e => handleInput('email', e.target.value)}
+                        className={`${t.input} border ${t.border} text-white p-3 rounded-lg`}
+                        autoComplete="new-password"
+                        required
+                    />
+                    <input
+                        placeholder="Κωδικός Πρόσβασης"
+                        value={newShop.password || ''}
+                        onChange={e => handleInput('password', e.target.value)}
+                        className={`${t.input} border ${t.border} text-white p-3 rounded-lg`}
+                        autoComplete="new-password"
+                        required
+                    />
+                    <select
+                        value={newShop.plan || 'Basic'}
+                        onChange={e => handleInput('plan', e.target.value)}
+                        className={`${t.input} border ${t.border} text-white p-3 rounded-lg`}
+                    >
                         <option value="Basic">Basic Plan</option>
                         <option value="Pro">Pro Plan</option>
                         <option value="Enterprise">Enterprise</option>
                     </select>
-                    <select value={newShop.theme} onChange={e => setNewShop({ ...newShop, theme: e.target.value })} className={`${t.input} border ${t.border} text-white p-3 rounded-lg`}>
+                    <select
+                        value={newShop.theme || 'default'}
+                        onChange={e => handleInput('theme', e.target.value)}
+                        className={`${t.input} border ${t.border} text-white p-3 rounded-lg`}
+                    >
                         <option value="default">Default Theme</option>
                         <option value="midnight">Midnight</option>
                         <option value="forest">Forest</option>
