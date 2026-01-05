@@ -1,0 +1,60 @@
+{
+  "name": "admin",
+  "main": "public/electron.js",
+  "version": "1.5.0",
+  "homepage": "./",
+  "description": "Geoter Service Management System",
+  "author": "Geoter",
+  "build": {
+    "appId": "com.geoter.service",
+    "productName": "Geoter Service Manager",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "dist/**/*",
+      "public/electron.js"
+    ],
+    "asar": false,
+    "win": {
+      "target": "portable"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "electron:dev": "concurrently \"vite\" \"wait-on tcp:5173 && electron .\"",
+    "electron:build": "vite build && electron-builder",
+    "start:prod": "electron ."
+  },
+  "dependencies": {
+    "axios": "^1.13.2",
+    "framer-motion": "^12.23.26",
+    "html2pdf.js": "^0.12.1",
+    "lucide-react": "^0.562.0",
+    "qrcode.react": "^4.2.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.11.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/react": "^19.2.5",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "autoprefixer": "^10.4.23",
+    "concurrently": "^8.2.2",
+    "electron": "^28.1.0",
+    "electron-builder": "^24.9.1",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17",
+    "vite": "^7.2.4",
+    "wait-on": "^7.2.0"
+  }
+}

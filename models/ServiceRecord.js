@@ -9,7 +9,8 @@ const ServiceRecordSchema = new mongoose.Schema({
   completedAt: Date,
   date: { type: Date, default: Date.now },
   price: { type: Number, default: 0 },      // Τιμή Χρέωσης (Έσοδο)
-  partsCost: { type: Number, default: 0 }   // ΝΕΟ: Κόστος Ανταλλακτικών (Έξοδο)
+  partsCost: { type: Number, default: 0 },   // ΝΕΟ: Κόστος Ανταλλακτικών (Έξοδο)
+  shop: { type: mongoose.Schema.Types.ObjectId, ref: 'Shop', required: true } // Multi-tenancy
 });
 
 module.exports = mongoose.model('ServiceRecord', ServiceRecordSchema);
