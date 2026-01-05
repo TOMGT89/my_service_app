@@ -52,8 +52,18 @@ const ServiceHistoryModal = ({ vehicle, onClose, user }) => {
     const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    const [deleteConfirmId, setDeleteConfirmId] = useState(null);
     const fetchHistory = async () => { try { const res = await fetch(`${API_URL}/api/services/history/${vehicle.plateNumber}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }); setHistory(await res.json()); } catch (err) { console.error(err); } finally { setLoading(false); } };
-    const handleDeleteRecord = async (recordId) => { if (!confirm('Διαγραφή;')) return; await fetch(`${API_URL}/api/services/${recordId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }); fetchHistory(); };
+    const handleDeleteRecord = async (recordId) => {
+        if (deleteConfirmId === recordId) {
+            await fetch(`${API_URL}/api/services/${recordId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+            setDeleteConfirmId(null);
+            fetchHistory();
+        } else {
+            setDeleteConfirmId(recordId);
+            setTimeout(() => setDeleteConfirmId(null), 3000);
+        }
+    };
     useEffect(() => { fetchHistory(); }, []);
 
     return (
@@ -74,7 +84,7 @@ const ServiceHistoryModal = ({ vehicle, onClose, user }) => {
                             <div key={record._id} className="bg-slate-800 border border-slate-700 rounded-xl p-5 hover:border-slate-600 transition-colors shadow-sm">
                                 <div className="flex justify-between mb-4 border-b border-slate-700/50 pb-3">
                                     <div className="flex items-center gap-3 text-slate-300"><Calendar size={16} className="text-blue-400" /><span className="font-mono font-bold text-white">{new Date(record.date).toLocaleDateString('el-GR')}</span><span className="text-slate-600">|</span><User size={16} className="text-purple-400" /><span className="text-sm">{record.mechanic}</span></div>
-                                    <button onClick={() => handleDeleteRecord(record._id)} className="text-slate-500 hover:text-red-400 transition-colors"><Trash2 size={18} /></button>
+                                    <button onClick={() => handleDeleteRecord(record._id)} className={`transition-colors p-1 rounded ${deleteConfirmId === record._id ? 'bg-red-600 text-white font-bold text-[10px]' : 'text-slate-500 hover:text-red-400'}`}>{deleteConfirmId === record._id ? 'ΣΙΓΟΥΡΑ;' : <Trash2 size={18} />}</button>
                                 </div>
                                 <div className="space-y-3 mb-4">{(Array.isArray(record.servicesPerformed) ? record.servicesPerformed : []).map((cat, i) => (<div key={i} className="bg-slate-900/50 rounded-lg p-3 border border-slate-700/30"><h4 className="text-[10px] font-bold text-slate-500 mb-2 uppercase tracking-wider">{cat.categoryTitle}</h4><div className="space-y-1">{(Array.isArray(cat.items) ? cat.items : []).map((item, j) => (<div key={j} className="flex items-center gap-2 text-sm text-slate-300"><CheckCircle size={14} className="text-green-500 shrink-0" /><span className="font-medium text-white">{item.name}</span><span className="text-slate-500 text-xs px-2 py-0.5 bg-slate-800 rounded border border-slate-700 ml-auto">{item.action}</span></div>))}</div></div>))}</div>
                                 {record.generalNotes && (<div className="bg-yellow-900/10 border-l-2 border-yellow-600/50 p-3 mb-4 rounded-r"><p className="text-sm text-yellow-500/80 italic whitespace-pre-wrap">{record.generalNotes}</p></div>)}
@@ -264,7 +274,7 @@ const MiniERPTab = ({ theme, user }) => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
                 <div className={`${t.card} rounded-xl border ${t.border} p-4 shadow-lg`}>
                     <h3 className="text-sm font-bold text-slate-400 mb-4 flex gap-2"><RefreshCw size={16} /> Πρότυπα Πάγια</h3>
-                    <form onSubmit={handleAddRecurring} className="flex gap-2 mb-4"><input placeholder="π.χ. Ενοίκιο" className={`${t.input} border ${t.border} text-white px-2 rounded flex-1 text-sm`} value={newRec.title} onChange={e => handleNewRecInput('title', e.target.value)} autoComplete="off" /><input type="number" placeholder="€" className={`${t.input} border ${t.border} text-white px-2 rounded w-20 text-sm`} value={newRec.amount} onChange={e => handleNewRecInput('amount', e.target.value)} autoComplete="off" /><button className={`${t.button} text-white px-3 rounded font-bold hover:bg-blue-500 text-sm`}>OK</button></form>
+                    <form onSubmit={handleAddRecurring} className="flex gap-2 mb-4"><input autoFocus placeholder="π.χ. Ενοίκιο" className={`${t.input} border ${t.border} text-white px-2 rounded flex-1 text-sm`} value={newRec.title} onChange={e => handleNewRecInput('title', e.target.value)} autoComplete="off" /><input type="number" placeholder="€" className={`${t.input} border ${t.border} text-white px-2 rounded w-20 text-sm`} value={newRec.amount} onChange={e => handleNewRecInput('amount', e.target.value)} autoComplete="off" /><button className={`${t.button} text-white px-3 rounded font-bold hover:bg-blue-500 text-sm`}>OK</button></form>
                     <div className="space-y-2">{recurring.map(r => (<div key={r._id} className={`flex justify-between items-center text-sm ${t.input} p-2 rounded`}><span className="text-slate-300 break-all">{r.title}</span><div className="flex gap-2 items-center">{editRecId === r._id ? (<div className="flex items-center gap-1"><input className={`w-16 ${t.card} text-white border ${t.border} rounded px-1`} value={editAmount} onChange={e => setEditAmount(e.target.value)} autoFocus autoComplete="off" /><button onClick={() => handleUpdateRecurring(r._id)} className="text-green-400"><CheckCircle size={14} /></button><button onClick={() => setEditRecId(null)} className="text-slate-400"><X size={14} /></button></div>) : (<div className="flex items-center gap-2"><span className="font-bold text-white">{r.amount} €</span><button onClick={() => { setEditRecId(r._id); setEditAmount(r.amount); }} className="text-yellow-500 hover:text-yellow-400"><Pencil size={14} /></button><button onClick={() => handleDeleteRecurring(r._id)} className={`${deleteConfirmId === r._id ? 'text-red-500 font-bold bg-white/10 px-2 rounded' : 'text-red-400 hover:text-red-300'}`}>{deleteConfirmId === r._id ? 'Σίγουρα;' : <X size={14} />}</button></div>)}</div></div>))}</div>
                 </div>
                 <div className={`${t.card} rounded-xl border ${t.border} overflow-hidden shadow-lg`}>
@@ -323,11 +333,19 @@ const GarageTab = ({ vehicles, refreshVehicles, theme, user }) => {
         setShowForm(false);
         setNewCar({ plateNumber: '', brand: '', model: '', ownerName: '', ownerPhone: '' });
         refreshVehicles();
+        // Return focus to body to clear any stuck state
+        document.body.focus();
     };
     const handleDeleteCar = async (e, id) => {
-        e.stopPropagation();
+        if (e) { e.stopPropagation(); e.preventDefault(); }
         if (deleteConfirmId === id) {
-            try { const res = await fetch(`${API_URL}/api/vehicles/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }); if (!res.ok) throw new Error(res.statusText); setDeleteConfirmId(null); refreshVehicles(); } catch (err) { console.error(err); alert('Error: ' + err.message); }
+            try {
+                const res = await fetch(`${API_URL}/api/vehicles/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+                if (!res.ok) throw new Error(res.statusText);
+                setDeleteConfirmId(null);
+                refreshVehicles();
+                document.body.focus(); // Clear focus from deleted button
+            } catch (err) { console.error(err); alert('Error: ' + err.message); }
         } else {
             setDeleteConfirmId(id);
             setTimeout(() => setDeleteConfirmId(null), 3000);
@@ -384,8 +402,8 @@ const GarageTab = ({ vehicles, refreshVehicles, theme, user }) => {
                 </div >
             )}
 
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4"><h2 className="text-2xl font-bold text-white">🚖 Διαχείριση Στόλου</h2><div className="flex gap-3 w-full md:w-auto"><div className="relative flex-1 md:w-64"><Search className={`absolute left-3 top-1/2 -translate-y-1/2 ${t.text}`} size={18} /><input type="text" placeholder="Αναζήτηση..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={`w-full ${t.input} border ${t.border} text-white pl-10 pr-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none uppercase`} autoComplete="off" /></div><button onClick={() => setShowForm(!showForm)} className={`${t.button} text-white px-4 py-2 rounded-lg flex gap-2 items-center`}><Plus size={18} /> <span className="hidden md:inline">Νέα Εισαγωγή</span></button></div></div>
-            <AnimatePresence>{showForm && (<motion.form initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} onSubmit={handleAdd} className={`${t.card} p-4 rounded-xl border ${t.border} grid grid-cols-1 md:grid-cols-2 gap-4 overflow-hidden`}><input placeholder="Πινακίδα (ΑΒΓ-1234)" value={newCar.plateNumber} onChange={e => handleNewCarInput('plateNumber', e.target.value.toUpperCase())} className={`${t.input} border ${t.border} text-white p-3 rounded-lg w-full font-bold uppercase tracking-wider`} autoComplete="off" /><div className="grid grid-cols-2 gap-2"><input placeholder="Μάρκα" value={newCar.brand} onChange={e => handleNewCarInput('brand', e.target.value)} className={`${t.input} border ${t.border} text-white p-3 rounded-lg`} autoComplete="off" /><input placeholder="Μοντέλο" value={newCar.model} onChange={e => handleNewCarInput('model', e.target.value)} className={`${t.input} border ${t.border} text-white p-3 rounded-lg`} autoComplete="off" /></div><input placeholder="Ονοματεπώνυμο Πελάτη" value={newCar.ownerName} onChange={e => handleNewCarInput('ownerName', e.target.value)} className={`${t.input} border ${t.border} text-white p-3 rounded-lg`} autoComplete="name" /><input placeholder="Τηλέφωνο Επικοινωνίας" value={newCar.ownerPhone} onChange={e => handleNewCarInput('ownerPhone', e.target.value)} className={`${t.input} border ${t.border} text-white p-3 rounded-lg`} autoComplete="tel" /><button type="submit" className="col-span-1 md:col-span-2 bg-green-600 text-white p-3 rounded-lg font-bold hover:bg-green-500 shadow-lg mt-2">Αποθήκευση Οχήματος</button></motion.form>)}</AnimatePresence>
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4"><h2 className="text-2xl font-bold text-white">🚖 Διαχείριση Στόλου</h2><div className="flex gap-3 w-full md:w-auto"><div className="relative flex-1 md:w-64"><Search className={`absolute left-3 top-1/2 -translate-y-1/2 ${t.text}`} size={18} /><input type="text" placeholder="Αναζήτηση..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={`w-full ${t.input} border ${t.border} text-white pl-10 pr-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none uppercase`} autoComplete="off" /></div><button onClick={(e) => { e.preventDefault(); setShowForm(!showForm); }} className={`${t.button} text-white px-4 py-2 rounded-lg flex gap-2 items-center`}><Plus size={18} /> <span className="hidden md:inline">Νέα Εισαγωγή</span></button></div></div>
+            <AnimatePresence>{showForm && (<motion.form initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} onSubmit={handleAdd} className={`${t.card} p-4 rounded-xl border ${t.border} grid grid-cols-1 md:grid-cols-2 gap-4 overflow-hidden`}><input autoFocus placeholder="Πινακίδα (ΑΒΓ-1234)" value={newCar.plateNumber} onChange={e => handleNewCarInput('plateNumber', e.target.value.toUpperCase())} className={`${t.input} border ${t.border} text-white p-3 rounded-lg w-full font-bold uppercase tracking-wider`} autoComplete="off" /><div className="grid grid-cols-2 gap-2"><input placeholder="Μάρκα" value={newCar.brand} onChange={e => handleNewCarInput('brand', e.target.value)} className={`${t.input} border ${t.border} text-white p-3 rounded-lg`} autoComplete="off" /><input placeholder="Μοντέλο" value={newCar.model} onChange={e => handleNewCarInput('model', e.target.value)} className={`${t.input} border ${t.border} text-white p-3 rounded-lg`} autoComplete="off" /></div><input placeholder="Ονοματεπώνυμο Πελάτη" value={newCar.ownerName} onChange={e => handleNewCarInput('ownerName', e.target.value)} className={`${t.input} border ${t.border} text-white p-3 rounded-lg`} autoComplete="name" /><input placeholder="Τηλέφωνο Επικοινωνίας" value={newCar.ownerPhone} onChange={e => handleNewCarInput('ownerPhone', e.target.value)} className={`${t.input} border ${t.border} text-white p-3 rounded-lg`} autoComplete="tel" /><button type="submit" className="col-span-1 md:col-span-2 bg-green-600 text-white p-3 rounded-lg font-bold hover:bg-green-500 shadow-lg mt-2">Αποθήκευση Οχήματος</button></motion.form>)}</AnimatePresence>
 
             {/* LIST VIEW */}
             <div className="flex flex-col gap-4">
@@ -397,7 +415,7 @@ const GarageTab = ({ vehicles, refreshVehicles, theme, user }) => {
                             : 'Καμία καταγραφή';
 
                         return (
-                            <motion.div key={car._id} layout className={`${t.card} border ${t.border} p-0 rounded-xl flex flex-col md:flex-row overflow-hidden hover:border-slate-500 transition-colors`}>
+                            <motion.div key={car._id} className={`${t.card} border ${t.border} p-0 rounded-xl flex flex-col md:flex-row overflow-hidden hover:border-slate-500 transition-colors`}>
                                 {/* 1. CAR INFO (LEFT) */}
                                 <div className={`p-4 ${t.sidebar} md:w-64 flex flex-col justify-center border-b md:border-b-0 md:border-r ${t.border}`}>
                                     <div className="flex items-center gap-3 mb-2">
@@ -526,10 +544,17 @@ const UsersTab = ({ theme, user }) => {
         setFormData({ username: '', password: '', salary: '', insurance: '' });
     };
 
+    const [deleteConfirmId, setDeleteConfirmId] = useState(null);
     const handleDelete = async (id) => {
-        if (!confirm('Διαγραφή;')) return;
-        await fetch(`${API_URL}/api/users/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-        fetchUsers();
+        if (deleteConfirmId === id) {
+            await fetch(`${API_URL}/api/users/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+            setDeleteConfirmId(null);
+            fetchUsers();
+            document.body.focus();
+        } else {
+            setDeleteConfirmId(id);
+            setTimeout(() => setDeleteConfirmId(null), 3000);
+        }
     };
 
     const togglePass = (id) => { setVisiblePasswords(prev => ({ ...prev, [id]: !prev[id] })); };
@@ -599,7 +624,7 @@ const UsersTab = ({ theme, user }) => {
                                 </td>
                                 <td className="p-4 text-right">
                                     <button onClick={() => handleEdit(u)} className="text-yellow-400 hover:text-yellow-300 mr-2 p-2 rounded hover:bg-yellow-400/10"><Pencil size={16} /></button>
-                                    <button onClick={() => handleDelete(u._id)} className="text-red-400 hover:text-red-300 p-2 rounded hover:bg-red-400/10"><Trash2 size={16} /></button>
+                                    <button onClick={() => handleDelete(u._id)} className={`transition-colors p-2 rounded ${deleteConfirmId === u._id ? 'bg-red-600 text-white font-bold text-[10px]' : 'text-red-400 hover:text-red-300 hover:bg-red-400/10'}`}>{deleteConfirmId === u._id ? 'ΣΙΓΟΥΡΑ;' : <Trash2 size={16} />}</button>
                                 </td>
                             </tr>
                         ))}
@@ -885,15 +910,21 @@ const SuperAdminTab = ({ theme }) => {
                             <div className="flex items-center gap-2">
                                 <span>{new Date(shop.createdAt).toLocaleDateString('el-GR')}</span>
                                 <button
-                                    onClick={async () => {
-                                        if (confirm('⚠️ ΠΡΟΣΟΧΗ: Διαγραφή Συνεργείου;\nΘα διαγραφούν ΟΛΟΙ οι χρήστες και τα δεδομένα του!')) {
+                                    onClick={async (e) => {
+                                        if (e) { e.stopPropagation(); e.preventDefault(); }
+                                        if (deleteConfirmId === shop._id) {
                                             await fetch(`${API_URL}/api/admin/shops/${shop._id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+                                            setDeleteConfirmId(null);
                                             fetchShops();
+                                            document.body.focus();
+                                        } else {
+                                            setDeleteConfirmId(shop._id);
+                                            setTimeout(() => setDeleteConfirmId(null), 3000);
                                         }
                                     }}
-                                    className="bg-red-900/40 text-red-400 p-1 rounded hover:bg-red-900 hover:text-white transition-colors"
+                                    className={`transition-colors p-1 rounded ${deleteConfirmId === shop._id ? 'bg-red-600 text-white font-bold text-[10px]' : 'bg-red-900/40 text-red-400 hover:bg-red-900 hover:text-white'}`}
                                 >
-                                    <Trash2 size={14} />
+                                    {deleteConfirmId === shop._id ? 'ΣΙΓΟΥΡΑ;' : <Trash2 size={14} />}
                                 </button>
                             </div>
                         </div>
