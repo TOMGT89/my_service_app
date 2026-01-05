@@ -684,9 +684,13 @@ const SettingsTab = ({ user, setUser, theme, showStatus }) => {
                     canvas.height = img.height * ratio;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    const isJpeg = file.type === 'image/jpeg';
+                    const outputType = isJpeg ? 'image/jpeg' : 'image/png';
+                    const extension = isJpeg ? 'jpg' : 'png';
+
                     canvas.toBlob((blob) => {
-                        resolve(new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".webp", { type: 'image/webp', lastModified: Date.now() }));
-                    }, 'image/webp', 0.8); // 80% Quality (Supports Transparency)
+                        resolve(new File([blob], file.name.replace(/\.[^/.]+$/, "") + "." + extension, { type: outputType, lastModified: Date.now() }));
+                    }, outputType, isJpeg ? 0.8 : undefined);
                 };
             };
         });
