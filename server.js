@@ -118,20 +118,35 @@ app.get('/api/emergency-reset', async (req, res) => {
         const username = 'superadmin';
         const password = 'password123';
 
+        // 0. Ensure Shop Exists due to Strict Schema
+        let shop = await Shop.findOne({ isSuperAdmin: true });
+        if (!shop) {
+            shop = await Shop.create({
+                name: 'Geoter HQ',
+                email: 'superadmin@geoter.gr',
+                password: 'hashed_placeholder', // Schema might require it
+                status: 'Active',
+                plan: 'Enterprise',
+                isSuperAdmin: true
+            });
+        }
+
         // 1. Delete existing to be sure
         await User.deleteOne({ username });
 
         // 2. Create Fresh
         const user = new User({
             username,
-            password, // Pre-save hook will hash it
+            password,
             role: 'superadmin',
-            plainPassword: password
+            plainPassword: password,
+            shop: shop._id // <--- CRITICAL FIX
         });
         await user.save();
 
-        res.json({ success: true, message: 'SuperAdmin Reset Successfully. Try logging in now.' });
+        res.json({ success: true, message: 'SuperAdmin Reset Successfully (With Shop). Try logging in now.' });
     } catch (e) {
+        console.error(e);
         res.status(500).json({ error: e.message });
     }
 });
