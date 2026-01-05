@@ -648,6 +648,16 @@ const SettingsTab = ({ user, setUser, theme, showStatus }) => {
     const [newPhone, setNewPhone] = useState('');
     const [selectedTheme, setSelectedTheme] = useState(user.theme || 'default');
 
+    // Sync state with user prop changes (e.g. after save)
+    useEffect(() => {
+        setName(user.shopName || '');
+        setPreviewUrl(user.logoUrl || '');
+        setStampPreview(user.stampUrl || '');
+        setPhones(user.phones || []);
+        setWebsite(user.website || '');
+        setSelectedTheme(user.theme || 'default');
+    }, [user]);
+
     // Safe handlers to prevent re-renders
     const handleFileSelect = (e, type) => {
         const file = e.target.files[0];

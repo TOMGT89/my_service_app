@@ -74,7 +74,7 @@ const ServiceBook = () => {
 
                 {/* HEADER */}
                 <div className="bg-slate-900 text-white p-6 text-center relative">
-                    {settings?.logoUrl && <img src={`http://localhost:5000${settings.logoUrl}`} className="h-16 mx-auto mb-2 object-contain" alt="Logo" />}
+                    {settings?.logoUrl && <img src={settings.logoUrl} className="h-16 mx-auto mb-2 object-contain" alt="Logo" />}
                     <h1 className="text-xl font-bold uppercase">{settings?.shopName || 'Συνεργείο'}</h1>
                     <p className="text-slate-400 text-sm mt-1 border border-slate-600 inline-block px-3 py-1 rounded">{plate}</p>
                     <button onClick={handleDownloadPDF} className="absolute top-4 right-4 bg-white/20 p-2 rounded-full hover:bg-white/30 print:hidden text-white">
@@ -113,7 +113,7 @@ const ServiceBook = () => {
                                 <div className="p-4 bg-white border-t border-gray-200 relative">
                                     {/* ΣΦΡΑΓΙΔΑ ΣΤΟ ΦΟΝΤΟ */}
                                     {settings?.stampUrl && (
-                                        <img src={`http://localhost:5000${settings.stampUrl}`} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 opacity-10 pointer-events-none" alt="Stamp" />
+                                        <img src={settings.stampUrl} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 opacity-10 pointer-events-none" alt="Stamp" />
                                     )}
 
                                     <ul className="space-y-2 relative z-10">

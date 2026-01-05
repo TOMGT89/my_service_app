@@ -385,9 +385,23 @@ app.get('/api/public/book/:plate', async (req, res) => {
         if (!vehicle) return res.status(404).json({ error: 'Vehicle not found' });
 
         const services = await ServiceRecord.find({ vehiclePlate: req.params.plate, status: 'Completed' }).sort({ date: -1 });
-        const user = await User.findOne({ role: 'admin' }); // Get shop info
 
-        res.json({ vehicle, services, shop: user ? { shopName: user.shopName, phones: user.phones, warning: 'Next Service Soon' } : {} });
+        // Find the Shop Admin to get settings (Logo, Phones, etc.)
+        // We look for a user with role 'admin' belonging to this shop
+        const adminUser = await User.findOne({ shop: vehicle.shop, role: 'admin' });
+
+        res.json({
+            vehicle,
+            services,
+            settings: adminUser ? {
+                shopName: adminUser.shopName,
+                phones: adminUser.phones,
+                website: adminUser.website,
+                logoUrl: adminUser.logoUrl,
+                stampUrl: adminUser.stampUrl,
+                theme: adminUser.theme
+            } : {}
+        });
     } catch (e) { res.status(500).json({ error: 'Error' }); }
 });
 
