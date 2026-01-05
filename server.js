@@ -210,15 +210,13 @@ app.post('/api/admin/shops', authMiddleware, async (req, res) => {
         const shop = await Shop.create({ ...shopData, status: 'Active' });
 
         // 2. Create Admin User for Shop
-        const salt = await bcrypt.genSalt(10);
         // Robustness: Trim Admin Inputs
         const adminUsername = adminUser.username.trim();
         const adminPassword = adminUser.password.trim();
 
-        const hashedPassword = await bcrypt.hash(adminPassword, salt);
         await User.create({
             username: adminUsername,
-            password: hashedPassword, // Manual hash since we might bypass pre-save or want explicit control
+            password: adminPassword, // Model pre-save hook will handle hashing
             role: 'admin',
             shop: shop._id,
             shopName: shop.name
