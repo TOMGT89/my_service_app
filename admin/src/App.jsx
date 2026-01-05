@@ -812,6 +812,7 @@ const SuperAdminTab = ({ theme }) => {
     const t = theme || THEMES.default;
     const [shops, setShops] = useState([]);
     const [newShop, setNewShop] = useState({ name: '', email: '', password: '', plan: 'Basic', theme: 'default' });
+    const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
     const fetchShops = async () => {
         try {
@@ -837,7 +838,12 @@ const SuperAdminTab = ({ theme }) => {
                     adminUser: { username: newShop.email, password: newShop.password }
                 })
             });
-            if (res.ok) { alert('✅ Κατάστημα Δημιουργήθηκε!'); setNewShop({ name: '', email: '', password: '', plan: 'Basic', theme: 'default' }); fetchShops(); }
+            if (res.ok) {
+                alert('✅ Κατάστημα Δημιουργήθηκε!');
+                setNewShop({ name: '', email: '', password: '', plan: 'Basic', theme: 'default' });
+                fetchShops();
+                document.body.focus();
+            }
             else { alert('❌ Σφάλμα'); }
         } catch (e) { alert('Error'); }
     };
@@ -853,6 +859,7 @@ const SuperAdminTab = ({ theme }) => {
                 <h3 className="font-bold text-slate-300 border-b border-slate-700 pb-2">➕ Νέο Συνεργείο</h3>
                 <form onSubmit={handleCreateShop} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input
+                        autoFocus
                         placeholder="Όνομα Συνεργείου"
                         value={newShop.name || ''}
                         onChange={e => handleInput('name', e.target.value)}
