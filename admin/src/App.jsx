@@ -813,7 +813,14 @@ const SuperAdminTab = ({ theme }) => {
     const [shops, setShops] = useState([]);
     const [newShop, setNewShop] = useState({ name: '', email: '', password: '', plan: 'Basic', theme: 'default' });
     const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+    const [status, setStatus] = useState(null); // { type: 'success'|'error', text: '' }
     const nameInputRef = React.useRef(null);
+
+    const showStatus = (text, type = 'success') => {
+        setStatus({ text, type });
+        setTimeout(() => setStatus(null), 4000);
+    };
+
 
 
     const fetchShops = async () => {
@@ -828,7 +835,13 @@ const SuperAdminTab = ({ theme }) => {
         } catch (e) { console.error('Error fetching shops:', e); setShops([]); }
     };
     useEffect(() => { fetchShops(); }, []);
-    useEffect(() => { if (nameInputRef.current) nameInputRef.current.focus(); }, [shops.length]);
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (nameInputRef.current) nameInputRef.current.focus();
+        }, 150);
+        return () => clearTimeout(timer);
+    }, [shops.length, status]);
+
 
 
     const handleCreateShop = async (e) => {
@@ -843,19 +856,24 @@ const SuperAdminTab = ({ theme }) => {
                 })
             });
             if (res.ok) {
-                alert('✅ Κατάστημα Δημιουργήθηκε!');
+                showStatus('✅ Κατάστημα Δημιουργήθηκε!');
                 setNewShop({ name: '', email: '', password: '', plan: 'Basic', theme: 'default' });
                 fetchShops();
-                document.body.focus();
             }
-            else { alert('❌ Σφάλμα'); }
-        } catch (e) { alert('Error'); }
+            else { showStatus('❌ Σφάλμα κατά τη δημιουργία', 'error'); }
+        } catch (e) { showStatus('❌ Network Error', 'error'); }
     };
 
     const handleInput = (key, value) => setNewShop(prev => ({ ...prev, [key]: value }));
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-8 relative">
+            {status && (
+                <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className={`fixed top-4 right-4 z-[100] p-4 rounded-xl shadow-2xl border ${status.type === 'success' ? 'bg-green-600 border-green-500' : 'bg-red-600 border-red-500'} text-white font-bold flex items-center gap-2`}>
+                    {status.type === 'success' ? <CheckCircle /> : <X />}
+                    {status.text}
+                </motion.div>
+            )}
             <h2 className="text-2xl font-bold text-white flex items-center gap-2"><LayoutDashboard className="text-purple-500" /> Διαχείριση Συνδρομητών (SaaS)</h2>
 
             {/* CREATE SHOP FORM */}
@@ -925,10 +943,13 @@ const SuperAdminTab = ({ theme }) => {
                                     onClick={async (e) => {
                                         if (e) { e.stopPropagation(); e.preventDefault(); }
                                         if (deleteConfirmId === shop._id) {
-                                            await fetch(`${API_URL}/api/admin/shops/${shop._id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
-                                            setDeleteConfirmId(null);
-                                            fetchShops();
-                                            document.body.focus();
+                                            try {
+                                                const res = await fetch(`${API_URL}/api/admin/shops/${shop._id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+                                                if (!res.ok) throw new Error();
+                                                setDeleteConfirmId(null);
+                                                showStatus('🗑️ Το κατάστημα διαγράφηκε');
+                                                fetchShops();
+                                            } catch (err) { showStatus('❌ Αποτυχία διαγραφής', 'error'); }
                                         } else {
                                             setDeleteConfirmId(shop._id);
                                             setTimeout(() => setDeleteConfirmId(null), 3000);
