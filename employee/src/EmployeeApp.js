@@ -85,10 +85,10 @@ function EmployeeApp() {
         try {
             const res = await fetch(`${API_URL}/api/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(credentials) });
             const data = await res.json();
-            if (data.success && data.user.role === 'employee') {
+            if (data.success && (data.user.role === 'employee' || data.user.role === 'admin' || data.user.role === 'superadmin')) {
                 setUser(data.user);
                 localStorage.setItem('token', data.token); // SAVE TOKEN
-            } else { alert('Λάθος στοιχεία'); }
+            } else { alert('Λάθος στοιχεία ή Δεν έχετε δικαίωμα πρόσβασης.'); }
         } catch (e) { alert('Δεν υπάρχει σύνδεση με τον Server.'); }
     };
 
