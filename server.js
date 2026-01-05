@@ -33,9 +33,9 @@ if (!fs.existsSync(UPLOADS_PATH)) {
 app.use('/uploads', express.static(UPLOADS_PATH));
 
 // 2. DATABASE CONNECTION
-// 2. DATABASE CONNECTION
-// process.env.MONGO_URI = 'mongodb+srv://tomgthome:Tomkorre1989!@cluster0.gubyec0.mongodb.net/service-app-db?retryWrites=true&w=majority&appName=Cluster0';
-mongoose.connect('mongodb+srv://tomgthome:Tomkorre1989!@cluster0.gubyec0.mongodb.net/service-app-db?retryWrites=true&w=majority&appName=Cluster0')
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://tomgthome:Tomkorre1989!@cluster0.gubyec0.mongodb.net/service-app-db?retryWrites=true&w=majority&appName=Cluster0';
+
+mongoose.connect(MONGO_URI)
     .then(async () => {
         console.log('✅ Connected to DB');
         // CLEANUP: Remove phantom vehicles (null or empty plate) on startup
