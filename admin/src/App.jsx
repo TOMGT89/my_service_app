@@ -469,7 +469,9 @@ const UsersTab = ({ theme, user }) => {
     const [formData, setFormData] = useState({ username: '', password: '', salary: '', insurance: '' });
     const [editingId, setEditingId] = useState(null);
     const [visiblePasswords, setVisiblePasswords] = useState({});
-    const fetchUsers = async () => {
+
+    // Prevent re-fetching loop
+    const fetchUsers = useCallback(async () => {
         try {
             const res = await fetch(`${API_URL}/api/users`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
             if (res.ok) {
@@ -477,16 +479,20 @@ const UsersTab = ({ theme, user }) => {
                 setUsers(Array.isArray(data) ? data : []);
             }
         } catch (e) { console.error('Error fetching users:', e); }
-    };
-    useEffect(() => { fetchUsers(); }, []);
+    }, []);
+
+    useEffect(() => { fetchUsers(); }, [fetchUsers]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` };
         try {
             let res;
-            if (editingId) { res = await fetch(`${API_URL}/api/users/${editingId}`, { method: 'PUT', headers, body: JSON.stringify(formData) }); }
-            else { res = await fetch(`${API_URL}/api/users`, { method: 'POST', headers, body: JSON.stringify(formData) }); }
+            if (editingId) {
+                res = await fetch(`${API_URL}/api/users/${editingId}`, { method: 'PUT', headers, body: JSON.stringify(formData) });
+            } else {
+                res = await fetch(`${API_URL}/api/users`, { method: 'POST', headers, body: JSON.stringify(formData) });
+            }
 
             if (res.ok) {
                 setFormData({ username: '', password: '', salary: '', insurance: '' });
@@ -500,22 +506,70 @@ const UsersTab = ({ theme, user }) => {
         } catch (e) { alert('❌ Network Error'); }
     };
 
-    const handleEdit = (u) => { setEditingId(u._id); setFormData({ username: u.username || '', password: u.plainPassword || '', salary: u.salary || '', insurance: u.insurance || '' }); };
-    const handleCancel = () => { setEditingId(null); setFormData({ username: '', password: '', salary: '', insurance: '' }); };
-    const handleDelete = async (id) => { if (!confirm('Διαγραφή;')) return; await fetch(`${API_URL}/api/users/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }); fetchUsers(); };
+    const handleEdit = (u) => {
+        setEditingId(u._id);
+        // Force string conversion
+        setFormData({
+            username: u.username || '',
+            password: u.plainPassword || '',
+            salary: String(u.salary || ''),
+            insurance: String(u.insurance || '')
+        });
+    };
+
+    const handleCancel = () => {
+        setEditingId(null);
+        setFormData({ username: '', password: '', salary: '', insurance: '' });
+    };
+
+    const handleDelete = async (id) => {
+        if (!confirm('Διαγραφή;')) return;
+        await fetch(`${API_URL}/api/users/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+        fetchUsers();
+    };
+
     const togglePass = (id) => { setVisiblePasswords(prev => ({ ...prev, [id]: !prev[id] })); };
+
+    // Helper for clean input
+    const handleInput = (field, val) => setFormData(prev => ({ ...prev, [field]: val }));
 
     return (
         <div className="space-y-6">
             <h2 className="text-2xl font-bold text-white">👥 Διαχείριση Προσωπικού</h2>
             <form onSubmit={handleSubmit} className={`${t.card} p-4 rounded-xl border ${t.border}`}>
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
-                    <input placeholder="Username" value={formData.username} onChange={e => setFormData({ ...formData, username: e.target.value })} className={`${t.input} border ${t.border} text-white p-2 rounded`} />
-                    <input placeholder="Password (New)" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} className={`${t.input} border ${t.border} text-white p-2 rounded`} />
-                    <input type="number" placeholder="Καθαρός Μισθός (€)" value={formData.salary} onChange={e => setFormData({ ...formData, salary: e.target.value })} className={`${t.input} border ${t.border} text-white p-2 rounded`} />
-                    <input type="number" placeholder="Κόστος Ασφάλισης (€)" value={formData.insurance} onChange={e => setFormData({ ...formData, insurance: e.target.value })} className={`${t.input} border ${t.border} text-white p-2 rounded`} />
+                    <input
+                        placeholder="Username"
+                        autoComplete="off"
+                        value={formData.username}
+                        onChange={e => handleInput('username', e.target.value)}
+                        className={`${t.input} border ${t.border} text-white p-2 rounded`}
+                    />
+                    <input
+                        placeholder="Password (New)"
+                        autoComplete="new-password"
+                        value={formData.password}
+                        onChange={e => handleInput('password', e.target.value)}
+                        className={`${t.input} border ${t.border} text-white p-2 rounded`}
+                    />
+                    <input
+                        type="number"
+                        placeholder="Καθαρός Μισθός (€)"
+                        value={formData.salary}
+                        onChange={e => handleInput('salary', e.target.value)}
+                        className={`${t.input} border ${t.border} text-white p-2 rounded`}
+                    />
+                    <input
+                        type="number"
+                        placeholder="Κόστος Ασφάλισης (€)"
+                        value={formData.insurance}
+                        onChange={e => handleInput('insurance', e.target.value)}
+                        className={`${t.input} border ${t.border} text-white p-2 rounded`}
+                    />
                     <div className="flex gap-2">
-                        <button className={`flex-1 text-white px-4 py-2 rounded font-bold ${editingId ? 'bg-yellow-600 hover:bg-yellow-500' : 'bg-purple-600 hover:bg-purple-500'}`}>{editingId ? 'Αλλαγή' : 'Προσθήκη'}</button>
+                        <button type="submit" className={`flex-1 text-white px-4 py-2 rounded font-bold ${editingId ? 'bg-yellow-600 hover:bg-yellow-500' : 'bg-purple-600 hover:bg-purple-500'}`}>
+                            {editingId ? 'Αλλαγή' : 'Προσθήκη'}
+                        </button>
                         {editingId && <button type="button" onClick={handleCancel} className="bg-slate-600 text-white px-3 rounded hover:bg-slate-500"><X /></button>}
                     </div>
                 </div>
@@ -523,7 +577,29 @@ const UsersTab = ({ theme, user }) => {
             <div className={`${t.card} rounded-xl overflow-hidden border ${t.border}`}>
                 <table className="w-full text-left text-slate-300">
                     <thead className="bg-slate-900 text-slate-400"><tr><th className="p-4">Όνομα</th><th className="p-4">Στοιχεία</th><th className="p-4">Μηνιαίο Κόστος</th><th className="p-4 text-right">Ενέργειες</th></tr></thead>
-                    <tbody>{Array.isArray(users) && users.map(u => (<tr key={u._id} className="border-t border-slate-700"><td className="p-4 font-bold text-white">{u.username}</td><td className="p-4"><div className="flex gap-2 items-center"><span className="font-mono bg-slate-900 px-2 py-1 rounded text-yellow-400">{visiblePasswords[u._id] ? (u.plainPassword || 'Κρυπτογραφημένο') : '••••••'}</span><button onClick={() => togglePass(u._id)} className="text-slate-400 hover:text-white"><Eye size={16} /></button></div></td><td className="p-4"><div className="text-xs text-slate-400">Μισθός: {u.salary || 0}€<br />Ασφάλεια: {u.insurance || 0}€</div><div className="font-bold text-white mt-1">Σύνολο: {(Number(u.salary) || 0) + (Number(u.insurance) || 0)}€</div></td><td className="p-4 text-right"><button onClick={() => handleEdit(u)} className="text-yellow-400 hover:text-yellow-300 mr-2 p-2 rounded hover:bg-yellow-400/10"><Pencil size={16} /></button><button onClick={() => handleDelete(u._id)} className="text-red-400 hover:text-red-300 p-2 rounded hover:bg-red-400/10"><Trash2 size={16} /></button></td></tr>))}</tbody>
+                    <tbody>
+                        {Array.isArray(users) && users.map(u => (
+                            <tr key={u._id} className="border-t border-slate-700">
+                                <td className="p-4 font-bold text-white">{u.username}</td>
+                                <td className="p-4">
+                                    <div className="flex gap-2 items-center">
+                                        <span className="font-mono bg-slate-900 px-2 py-1 rounded text-yellow-400">
+                                            {visiblePasswords[u._id] ? (u.plainPassword || 'Κρυπτογραφημένο') : '••••••'}
+                                        </span>
+                                        <button onClick={() => togglePass(u._id)} className="text-slate-400 hover:text-white"><Eye size={16} /></button>
+                                    </div>
+                                </td>
+                                <td className="p-4">
+                                    <div className="text-xs text-slate-400">Μισθός: {u.salary || 0}€<br />Ασφάλεια: {u.insurance || 0}€</div>
+                                    <div className="font-bold text-white mt-1">Σύνολο: {(Number(u.salary) || 0) + (Number(u.insurance) || 0)}€</div>
+                                </td>
+                                <td className="p-4 text-right">
+                                    <button onClick={() => handleEdit(u)} className="text-yellow-400 hover:text-yellow-300 mr-2 p-2 rounded hover:bg-yellow-400/10"><Pencil size={16} /></button>
+                                    <button onClick={() => handleDelete(u._id)} className="text-red-400 hover:text-red-300 p-2 rounded hover:bg-red-400/10"><Trash2 size={16} /></button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -543,8 +619,7 @@ const SettingsTab = ({ user, setUser, theme }) => {
     const [newPhone, setNewPhone] = useState('');
     const [selectedTheme, setSelectedTheme] = useState(user.theme || 'default');
 
-    // Theme comes from props now (robust fallback from parent)
-
+    // Safe handlers to prevent re-renders
     const handleFileSelect = (e, type) => {
         const file = e.target.files[0];
         if (file) {
@@ -589,7 +664,7 @@ const SettingsTab = ({ user, setUser, theme }) => {
         formData.append('theme', selectedTheme);
 
         if (logoFile) {
-            const resized = await resizeImage(logoFile, 400); // Resize to 400px width
+            const resized = await resizeImage(logoFile, 400);
             formData.append('logo', resized);
         }
         if (stampFile) {
@@ -650,15 +725,15 @@ const SettingsTab = ({ user, setUser, theme }) => {
             <div className={`${t.card} p-6 rounded-xl border ${t.border} space-y-4`}>
                 <label className={`block ${t.text} mb-2 font-bold`}>Επιλογή Θέματος</label>
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                    {Object.values(THEMES).map(t => (
+                    {Object.values(THEMES).map(th => (
                         <button
-                            key={t.id}
-                            onClick={() => setSelectedTheme(t.id)}
-                            className={`p-3 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${selectedTheme === t.id ? 'border-green-500 scale-105' : 'border-transparent hover:scale-105'}`}
-                            style={{ backgroundColor: t.id === 'default' ? '#0f172a' : t.id === 'midnight' ? '#18181b' : t.id === 'forest' ? '#1c1917' : t.id === 'ocean' ? '#0b1120' : '#111827' }}
+                            key={th.id}
+                            onClick={() => setSelectedTheme(th.id)}
+                            className={`p-3 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${selectedTheme === th.id ? 'border-green-500 scale-105' : 'border-transparent hover:scale-105'}`}
+                            style={{ backgroundColor: th.id === 'default' ? '#0f172a' : th.id === 'midnight' ? '#18181b' : th.id === 'forest' ? '#1c1917' : th.id === 'ocean' ? '#0b1120' : '#111827' }}
                         >
-                            <div className={`w-6 h-6 rounded-full ${t.activeTab}`}></div>
-                            <span className="text-xs text-white font-bold">{t.name}</span>
+                            <div className={`w-6 h-6 rounded-full ${th.activeTab}`}></div>
+                            <span className="text-xs text-white font-bold">{th.name}</span>
                         </button>
                     ))}
                 </div>
