@@ -33,6 +33,7 @@ function createWindow() {
         // In Prod: Load built files
         // Ensure "homepage": "./" is set in package.json for relative paths
         mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
+        mainWindow.webContents.openDevTools(); // <--- FORCED OPEN FOR DEBUGGING
     }
     return mainWindow;
 }

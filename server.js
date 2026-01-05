@@ -151,6 +151,37 @@ app.post('/api/login', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error', details: e.message });
     }
 });
+// ADMIN ROUTES (Super Admin)
+app.get('/api/admin/shops', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.role !== 'superadmin') return res.status(403).json({ error: 'Access Denied' });
+        const shops = await Shop.find().sort({ createdAt: -1 });
+        res.json(shops);
+    } catch (e) { res.status(500).json({ error: 'Error' }); }
+});
+
+app.post('/api/admin/shops', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.role !== 'superadmin') return res.status(403).json({ error: 'Access Denied' });
+        const { shopData, adminUser } = req.body;
+
+        // 1. Create Shop
+        const shop = await Shop.create({ ...shopData, status: 'Active' });
+
+        // 2. Create Admin User for Shop
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(adminUser.password, salt);
+        await User.create({
+            username: adminUser.username,
+            password: hashedPassword, // Manual hash since we might bypass pre-save or want explicit control
+            role: 'admin',
+            shop: shop._id,
+            shopName: shop.name
+        });
+
+        res.json(shop);
+    } catch (e) { console.error(e); res.status(500).json({ error: 'Creation Error' }); }
+});
 
 // SETTINGS (Protected)
 app.put('/api/settings/:userId', upload.fields([{ name: 'logo' }, { name: 'stamp' }]), async (req, res) => {
@@ -175,7 +206,7 @@ app.put('/api/settings/:userId', upload.fields([{ name: 'logo' }, { name: 'stamp
 
 // USERS (Isolated)
 app.get('/api/users', authMiddleware, async (req, res) => res.json(await User.find({ shop: req.shopId })));
-app.post('/api/users', authMiddleware, async (req, res) => { try { res.json(await User.create({ ...req.body, shop: req.shopId })); } catch (e) { res.status(500).json({ error: 'Error' }); } });
+app.post('/api/users', authMiddleware, async (req, res) => { try { res.json(await User.create({ ...req.body, shop: req.shopId })); } catch (e) { console.error('User Create Error:', e); res.status(500).json({ error: e.message }); } });
 app.put('/api/users/:id', authMiddleware, async (req, res) => { try { res.json(await User.findOneAndUpdate({ _id: req.params.id, shop: req.shopId }, req.body, { new: true })); } catch (e) { res.status(500).json({ error: 'Error' }); } });
 app.delete('/api/users/:id', authMiddleware, async (req, res) => { try { await User.findOneAndDelete({ _id: req.params.id, shop: req.shopId }); res.json({ success: true }); } catch (e) { res.status(500).json({ error: 'Error' }); } });
 
