@@ -266,8 +266,7 @@ app.put('/api/settings/:userId', upload.fields([{ name: 'logo' }, { name: 'stamp
         const updateData = { shopName, website };
         if (theme) updateData.theme = theme;
         if (phones) updateData.phones = JSON.parse(phones);
-        // ... (File handling logic same as before, omitted for brevity but assumed safe due to replace logic)
-        // Re-implementing file handling briefly to ensure no data loss in replace:
+
         const toBase64 = (file) => `data:${file.mimetype};base64,${fs.readFileSync(file.path, { encoding: 'base64' })}`;
         if (req.files['logo']) { updateData.logoUrl = toBase64(req.files['logo'][0]); fs.unlinkSync(req.files['logo'][0].path); }
         else if (req.body.clearLogo === 'true') updateData.logoUrl = '';
@@ -275,6 +274,19 @@ app.put('/api/settings/:userId', upload.fields([{ name: 'logo' }, { name: 'stamp
         else if (req.body.clearStamp === 'true') updateData.stampUrl = '';
 
         const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
+
+        // SYNC WITH SHOP MODEL (For Public API reliability)
+        if (updatedUser.shop) {
+            await Shop.findByIdAndUpdate(updatedUser.shop, {
+                name: shopName,
+                website,
+                phones: updateData.phones,
+                logoUrl: updateData.logoUrl,
+                stampUrl: updateData.stampUrl,
+                theme: updateData.theme
+            });
+        }
+
         res.json(updatedUser);
     } catch (err) { res.status(500).json({ error: 'Failed' }); }
 });
@@ -386,20 +398,19 @@ app.get('/api/public/book/:plate', async (req, res) => {
 
         const services = await ServiceRecord.find({ vehiclePlate: req.params.plate, status: 'Completed' }).sort({ date: -1 });
 
-        // Find the Shop Admin to get settings (Logo, Phones, etc.)
-        // We look for a user with role 'admin' belonging to this shop
-        const adminUser = await User.findOne({ shop: vehicle.shop, role: 'admin' });
+        // Find Shop directly (Primary source for public metadata)
+        const shop = await Shop.findById(vehicle.shop);
 
         res.json({
             vehicle,
             services,
-            settings: adminUser ? {
-                shopName: adminUser.shopName,
-                phones: adminUser.phones,
-                website: adminUser.website,
-                logoUrl: adminUser.logoUrl,
-                stampUrl: adminUser.stampUrl,
-                theme: adminUser.theme
+            settings: shop ? {
+                shopName: shop.name,
+                phones: shop.phones,
+                website: shop.website,
+                logoUrl: shop.logoUrl,
+                stampUrl: shop.stampUrl,
+                theme: shop.theme
             } : {}
         });
     } catch (e) { res.status(500).json({ error: 'Error' }); }
