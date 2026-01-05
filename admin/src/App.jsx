@@ -785,7 +785,15 @@ const SuperAdminTab = ({ theme }) => {
     const [newShop, setNewShop] = useState({ name: '', email: '', password: '', plan: 'Basic', theme: 'default' });
 
     const fetchShops = async () => {
-        try { const res = await fetch(`${API_URL}/api/admin/shops`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }); setShops(await res.json()); } catch (e) { }
+        try {
+            const res = await fetch(`${API_URL}/api/admin/shops`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+            if (res.ok) {
+                const data = await res.json();
+                setShops(Array.isArray(data) ? data : []);
+            } else {
+                setShops([]);
+            }
+        } catch (e) { console.error('Error fetching shops:', e); setShops([]); }
     };
     useEffect(() => { fetchShops(); }, []);
 
