@@ -278,12 +278,12 @@ app.put('/api/settings/:userId', upload.fields([{ name: 'logo' }, { name: 'stamp
         // SYNC WITH SHOP MODEL (For Public API reliability)
         if (updatedUser.shop) {
             await Shop.findByIdAndUpdate(updatedUser.shop, {
-                name: shopName,
-                website,
-                phones: updateData.phones,
-                logoUrl: updateData.logoUrl,
-                stampUrl: updateData.stampUrl,
-                theme: updateData.theme
+                name: updatedUser.shopName,
+                website: updatedUser.website,
+                phones: updatedUser.phones,
+                logoUrl: updatedUser.logoUrl,
+                stampUrl: updatedUser.stampUrl,
+                theme: updatedUser.theme
             });
         }
 
