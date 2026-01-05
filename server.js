@@ -112,6 +112,14 @@ app.get('/api/version', (req, res) => {
     res.json({ version: '2.1', timestamp: Date.now(), message: 'Server is UPDATED!' });
 });
 
+app.get('/api/debug-db', (req, res) => {
+    res.json({
+        db: mongoose.connection.name,
+        host: mongoose.connection.host,
+        readyState: mongoose.connection.readyState
+    });
+});
+
 // EMERGENCY RESET (Temporary)
 app.get('/api/emergency-reset', async (req, res) => {
     try {
