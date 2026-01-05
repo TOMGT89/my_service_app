@@ -157,7 +157,7 @@ const MiniERPTab = ({ theme, user }) => {
     const handleAddRecurring = async (e) => { e.preventDefault(); await fetch(`${API_URL}/api/recurring-expenses`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` }, body: JSON.stringify(newRec) }); setNewRec({ title: '', amount: '' }); fetchData(); };
     const handleDeleteRecurring = async (id) => {
         if (deleteConfirmId === id) {
-            try { await fetch(`${API_URL}/api/recurring-expenses/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }); setDeleteConfirmId(null); fetchData(); } catch (e) { alert('Error deleting'); }
+            try { await fetch(`${API_URL}/api/recurring-expenses/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }); setDeleteConfirmId(null); fetchData(); } catch (e) { }
         } else {
             setDeleteConfirmId(id);
             setTimeout(() => setDeleteConfirmId(null), 3000); // Auto-cancel after 3s
@@ -170,7 +170,7 @@ const MiniERPTab = ({ theme, user }) => {
     };
     const handleDeleteExpense = async (id) => {
         if (deleteConfirmId === id) {
-            try { await fetch(`${API_URL}/api/expenses/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }); setDeleteConfirmId(null); fetchData(); } catch (e) { alert('Error deleting'); }
+            try { await fetch(`${API_URL}/api/expenses/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }); setDeleteConfirmId(null); fetchData(); } catch (e) { }
         } else {
             setDeleteConfirmId(id);
             setTimeout(() => setDeleteConfirmId(null), 3000); // Auto-cancel after 3s
@@ -312,7 +312,7 @@ const GarageTab = ({ vehicles, refreshVehicles, theme, user }) => {
 
     const handleAdd = async (e) => {
         e.preventDefault();
-        if (!newCar.plateNumber) return alert("Βάλε πινακίδα!");
+        if (!newCar.plateNumber) return;
 
         // 1. Create Vehicle
         await fetch(`${API_URL}/api/vehicles`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` }, body: JSON.stringify(newCar) });
@@ -345,7 +345,7 @@ const GarageTab = ({ vehicles, refreshVehicles, theme, user }) => {
                 setDeleteConfirmId(null);
                 refreshVehicles();
                 document.body.focus(); // Clear focus from deleted button
-            } catch (err) { console.error(err); alert('Error: ' + err.message); }
+            } catch (err) { console.error(err); }
         } else {
             setDeleteConfirmId(id);
             setTimeout(() => setDeleteConfirmId(null), 3000);
@@ -362,7 +362,7 @@ const GarageTab = ({ vehicles, refreshVehicles, theme, user }) => {
             });
             setEditingPriceServiceId(null);
             refreshVehicles();
-        } catch (e) { alert('Update failed'); }
+        } catch (e) { }
     };
 
     return (
@@ -485,7 +485,7 @@ const GarageTab = ({ vehicles, refreshVehicles, theme, user }) => {
 };
 
 // 5. USERS TAB
-const UsersTab = ({ theme, user }) => {
+const UsersTab = ({ theme, user, showStatus }) => {
     const t = theme || THEMES.default;
     const [users, setUsers] = useState([]);
     const [formData, setFormData] = useState({ username: '', password: '', salary: '', insurance: '' });
@@ -520,12 +520,12 @@ const UsersTab = ({ theme, user }) => {
                 setFormData({ username: '', password: '', salary: '', insurance: '' });
                 setEditingId(null);
                 fetchUsers();
-                alert('✅ Επιτυχία!');
+                showStatus('✅ Επιτυχία!');
             } else {
                 const err = await res.json();
-                alert('❌ Σφάλμα: ' + (err.error || 'Άγνωστο Σφάλμα'));
+                showStatus('❌ Σφάλμα: ' + (err.error || 'Άγνωστο Σφάλμα'), 'error');
             }
-        } catch (e) { alert('❌ Network Error'); }
+        } catch (e) { showStatus('❌ Network Error', 'error'); }
     };
 
     const handleEdit = (u) => {
@@ -636,7 +636,7 @@ const UsersTab = ({ theme, user }) => {
 };
 
 // 6. SETTINGS TAB
-const SettingsTab = ({ user, setUser, theme }) => {
+const SettingsTab = ({ user, setUser, theme, showStatus }) => {
     const t = theme || THEMES.default;
     const [name, setName] = useState(user.shopName || '');
     const [logoFile, setLogoFile] = useState(null);
@@ -707,11 +707,12 @@ const SettingsTab = ({ user, setUser, theme }) => {
             body: formData
         });
 
-        if (res.ok) { setUser(await res.json()); alert('✅ Αποθηκεύτηκαν!'); } else alert('❌ Σφάλμα');
+        if (res.ok) { setUser(await res.json()); showStatus('✅ Αποθηκεύτηκαν!'); } else showStatus('❌ Σφάλμα', 'error');
     };
 
+    const [resetConfirm, setResetConfirm] = useState(false);
     const handleReset = async () => {
-        if (!confirm('ΠΡΟΣΟΧΗ: Θα διαγραφούν ΟΛΑ τα στοιχεία του συνεργείου (Όνομα, Λογότυπο, Τηλέφωνα, Σφραγίδα). Είσαι σίγουρος;')) return;
+        if (!resetConfirm) { setResetConfirm(true); setTimeout(() => setResetConfirm(false), 3000); return; }
 
         const formData = new FormData();
         formData.append('shopName', 'New Shop');
@@ -738,12 +739,12 @@ const SettingsTab = ({ user, setUser, theme }) => {
                 setLogoFile(null);
                 setStampFile(null);
                 setSelectedTheme('default');
-                alert('[VERSION 2.0] ✅ Έγινε επαναφορά στις εργοστασιακές ρυθμίσεις!');
+                showStatus('✅ Έγινε επαναφορά!');
             } else {
-                alert('[VERSION 2.0] ❌ Σφάλμα κατά την επαναφορά');
+                showStatus('❌ Σφάλμα', 'error');
             }
         } catch (e) {
-            alert('Error resetting settings');
+            showStatus('❌ Error resetting', 'error');
         }
     };
 
@@ -798,7 +799,7 @@ const SettingsTab = ({ user, setUser, theme }) => {
                 </div>
             </div>
             <div className="flex gap-4">
-                <button onClick={handleReset} className="flex-1 bg-red-900/40 hover:bg-red-900/60 border border-red-900 text-red-400 py-4 rounded-xl font-bold text-lg shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2"><Trash2 size={20} /> ΕΠΑΝΑΦΟΡΑ</button>
+                <button onClick={handleReset} className={`flex-1 ${resetConfirm ? 'bg-red-600' : 'bg-red-900/40 hover:bg-red-900/60'} border border-red-900 text-red-400 py-4 rounded-xl font-bold text-lg shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2`}><Trash2 size={20} /> {resetConfirm ? 'ΣΙΓΟΥΡΑ;' : 'ΕΠΑΝΑΦΟΡΑ'}</button>
                 <button onClick={handleSave} className="flex-[2] bg-blue-600 hover:bg-blue-500 text-white py-4 rounded-xl font-bold text-lg shadow-lg active:scale-95 transition-transform">Αποθήκευση Όλων</button>
             </div>
         </div>
@@ -808,20 +809,12 @@ const SettingsTab = ({ user, setUser, theme }) => {
 
 
 // 7. SUPER ADMIN TAB (NEW)
-const SuperAdminTab = ({ theme }) => {
+const SuperAdminTab = ({ theme, showStatus }) => {
     const t = theme || THEMES.default;
     const [shops, setShops] = useState([]);
     const [newShop, setNewShop] = useState({ name: '', email: '', password: '', plan: 'Basic', theme: 'default' });
     const [deleteConfirmId, setDeleteConfirmId] = useState(null);
-    const [status, setStatus] = useState(null); // { type: 'success'|'error', text: '' }
     const nameInputRef = React.useRef(null);
-
-    const showStatus = (text, type = 'success') => {
-        setStatus({ text, type });
-        setTimeout(() => setStatus(null), 4000);
-    };
-
-
 
     const fetchShops = async () => {
         try {
@@ -840,7 +833,7 @@ const SuperAdminTab = ({ theme }) => {
             if (nameInputRef.current) nameInputRef.current.focus();
         }, 150);
         return () => clearTimeout(timer);
-    }, [shops.length, status]);
+    }, [shops.length]);
 
 
 
@@ -868,12 +861,6 @@ const SuperAdminTab = ({ theme }) => {
 
     return (
         <div className="space-y-8 relative">
-            {status && (
-                <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className={`fixed top-4 right-4 z-[100] p-4 rounded-xl shadow-2xl border ${status.type === 'success' ? 'bg-green-600 border-green-500' : 'bg-red-600 border-red-500'} text-white font-bold flex items-center gap-2`}>
-                    {status.type === 'success' ? <CheckCircle /> : <X />}
-                    {status.text}
-                </motion.div>
-            )}
             <h2 className="text-2xl font-bold text-white flex items-center gap-2"><LayoutDashboard className="text-purple-500" /> Διαχείριση Συνδρομητών (SaaS)</h2>
 
             {/* CREATE SHOP FORM */}
@@ -972,6 +959,8 @@ const SuperAdminTab = ({ theme }) => {
 const AdminDashboard = () => {
     const [user, setUser] = useState(null);
     const [credentials, setCredentials] = useState({ username: '', password: '' });
+    const [status, setStatus] = useState(null); // { type: 'success'|'error', text: '' }
+    const showStatus = (text, type = 'success') => { setStatus({ text, type }); setTimeout(() => setStatus(null), 4000); };
     const handleLoginInput = (f, v) => setCredentials(p => ({ ...p, [f]: v }));
     const [activeTab, setActiveTab] = useState('home');
     const [vehicles, setVehicles] = useState([]);
@@ -1006,7 +995,7 @@ const AdminDashboard = () => {
             const contentType = res.headers.get("content-type");
             if (!contentType || !contentType.includes("application/json")) {
                 const text = await res.text();
-                throw new Error(`Server returned non-JSON response: ${text.substring(0, 100)}...`);
+                throw new Error(`Server returned non - JSON response: ${text.substring(0, 100)}...`);
             }
 
             const data = await res.json();
@@ -1017,12 +1006,13 @@ const AdminDashboard = () => {
                 setUser(userObj);
                 localStorage.setItem('user', JSON.stringify(userObj));
                 localStorage.setItem('token', data.token); // SAVE TOKEN
+                showStatus('✅ Login Successful');
             } else {
-                alert(`[LOGIN FAILED]\nStatus: ${res.status}\nMessage: ${data.message || data.error || 'Unknown Error'}`);
+                showStatus('❌ Σφάλμα: ' + (data.message || data.error || 'Unknown Error'), 'error');
                 console.error('Login Fail:', data);
             }
         } catch (e) {
-            alert(`[NETWORK ERROR]\nDetails: ${e.message}\n\nCheck if Server is running at ${API_URL}`);
+            showStatus('❌ Network Error: ' + e.message, 'error');
             console.error('Login Exception:', e);
         }
     };
@@ -1033,6 +1023,14 @@ const AdminDashboard = () => {
             <div className="min-h-screen w-full bg-[#0f172a] flex items-center justify-center relative overflow-hidden">
                 <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse" />
                 <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse delay-1000" />
+
+                {status && (
+                    <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className={`fixed top-4 left-1/2 -translate-x-1/2 z-[100] p-4 rounded-xl shadow-2xl border ${status.type === 'success' ? 'bg-green-600 border-green-500' : 'bg-red-600 border-red-500'} text-white font-bold flex items-center gap-2`}>
+                        {status.type === 'success' ? <CheckCircle /> : <X />}
+                        {status.text}
+                    </motion.div>
+                )}
+
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md p-8 bg-slate-900/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-2xl relative z-10 mx-4">
                     <div className="text-center mb-10">{logoToDisplay ? <img src={logoToDisplay} alt="Logo" className="h-24 mx-auto mb-6 object-contain" /> : <div className="w-20 h-20 bg-gradient-to-tr from-blue-500 to-purple-600 rounded-2xl mx-auto flex items-center justify-center shadow-lg mb-6"><Wrench className="w-10 h-10 text-white" /></div>}<h1 className="text-3xl font-bold text-white mb-2">Geoter Cloud v2</h1><p className="text-slate-400">Σύστημα Διαχείρισης</p></div>
                     <form onSubmit={handleLogin} className="space-y-6"><div className="space-y-2"><label className="text-sm text-slate-300">Username</label><input type="text" className="w-full p-3 bg-slate-800/50 border border-slate-700 rounded-xl text-white outline-none focus:border-blue-500" placeholder="admin" value={credentials.username} onChange={(e) => handleLoginInput('username', e.target.value)} autoComplete="username" /></div><div className="space-y-2"><label className="text-sm text-slate-300">Password</label><input type="password" className="w-full p-3 bg-slate-800/50 border border-slate-700 rounded-xl text-white outline-none focus:border-blue-500" placeholder="••••••••" value={credentials.password} onChange={(e) => handleLoginInput('password', e.target.value)} autoComplete="current-password" /></div><button className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-xl flex justify-center items-center gap-2">Σύνδεση</button></form>
@@ -1043,7 +1041,13 @@ const AdminDashboard = () => {
 
     return (
         <ErrorBoundary>
-            <div className={`min-h-screen ${theme?.bg || 'bg-slate-900'} text-white flex transition-colors duration-300`}>
+            <div className={`min-h-screen ${theme?.bg || 'bg-slate-900'} text-white flex transition-colors duration-300 relative`}>
+                {status && (
+                    <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className={`fixed top-4 left-1/2 -translate-x-1/2 z-[100] p-4 rounded-xl shadow-2xl border ${status.type === 'success' ? 'bg-green-600 border-green-500' : 'bg-red-600 border-red-500'} text-white font-bold flex items-center gap-2`}>
+                        {status.type === 'success' ? <CheckCircle /> : <X />}
+                        {status.text}
+                    </motion.div>
+                )}
 
                 {/* APP QR MODAL */}
                 <AnimatePresence>
@@ -1080,7 +1084,7 @@ const AdminDashboard = () => {
                     </nav>
 
                     <div className="px-2 space-y-2">
-                        <button onClick={() => setShowAppQR(true)} className={`w-full p-3 rounded-xl flex items-center justify-center lg:justify-start gap-3 transition-all text-slate-400 hover:bg-white/5 hover:text-white`}><Smartphone size={20} /> <span className="hidden lg:inline font-bold">Mobile App</span></button>
+                        <button onClick={() => setShowAppQR(true)} className="w-full p-3 rounded-xl flex items-center justify-center lg:justify-start gap-3 transition-all text-slate-400 hover:bg-white/5 hover:text-white"><Smartphone size={20} /> <span className="hidden lg:inline font-bold">Mobile App</span></button>
                         <button onClick={() => setActiveTab('settings')} className={`w-full p-3 rounded-xl flex items-center justify-center lg:justify-start gap-3 transition-all ${activeTab === 'settings' ? 'bg-slate-600 text-white' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}><Settings size={20} /> <span className="hidden lg:inline font-bold">Ρυθμίσεις</span></button>
                         <button onClick={() => { localStorage.removeItem('user'); localStorage.removeItem('token'); setUser(null); }} className="w-full p-3 rounded-xl flex items-center justify-center lg:justify-start gap-3 text-red-400 hover:bg-red-900/20 transition-all"><LogOut size={20} /> <span className="hidden lg:inline font-bold">Έξοδος</span></button>
                     </div>
@@ -1089,9 +1093,9 @@ const AdminDashboard = () => {
                     {activeTab === 'home' && <GarageTab vehicles={vehicles} refreshVehicles={refreshVehicles} theme={theme} user={user} />}
                     {activeTab === 'erp' && <MiniERPTab theme={theme} user={user} />}
                     {activeTab === 'book' && <div className="h-full bg-slate-900 rounded-xl overflow-hidden border border-slate-700 relative"><ServiceBook /></div>}
-                    {activeTab === 'users' && <UsersTab theme={theme} user={user} />}
-                    {activeTab === 'settings' && <SettingsTab user={user} setUser={setUser} theme={theme} />}
-                    {activeTab === 'superadmin' && user.role === 'superadmin' && <SuperAdminTab user={user} theme={theme} />}
+                    {activeTab === 'users' && <UsersTab theme={theme} user={user} showStatus={showStatus} />}
+                    {activeTab === 'settings' && <SettingsTab user={user} setUser={setUser} theme={theme} showStatus={showStatus} />}
+                    {activeTab === 'superadmin' && user.role === 'superadmin' && <SuperAdminTab theme={theme} showStatus={showStatus} />}
                 </div>
             </div>
         </ErrorBoundary>

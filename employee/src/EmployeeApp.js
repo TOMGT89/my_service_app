@@ -74,6 +74,8 @@ function EmployeeApp() {
 
     const [expandedSection, setExpandedSection] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [status, setStatus] = useState(null); // { type: 'success'|'error', text: '' }
+    const showStatus = (text, type = 'success') => { setStatus({ text, type }); setTimeout(() => setStatus(null), 4000); };
 
     // SCANNER QR (REMOVED)
     // const fileInputRef = useRef(null);
@@ -88,8 +90,9 @@ function EmployeeApp() {
             if (data.success && (data.user.role === 'employee' || data.user.role === 'admin' || data.user.role === 'superadmin')) {
                 setUser(data.user);
                 localStorage.setItem('token', data.token); // SAVE TOKEN
-            } else { alert('Λάθος στοιχεία ή Δεν έχετε δικαίωμα πρόσβασης.'); }
-        } catch (e) { alert('Δεν υπάρχει σύνδεση με τον Server.'); }
+                showStatus('✅ Σύνδεση επιτυχής!');
+            } else { showStatus('❌ Λάθος στοιχεία ή Δεν έχετε δικαίωμα πρόσβασης.', 'error'); }
+        } catch (e) { showStatus('❌ Δεν υπάρχει σύνδεση με τον Server.', 'error'); }
     };
 
     // --- ΦΟΡΤΩΣΗ ΕΚΚΡΕΜΩΝ ---
@@ -160,9 +163,9 @@ function EmployeeApp() {
         setExtras(prev => ({ ...prev, [item]: !prev[item] }));
     };
 
-    const handleSave = async (status = 'Completed') => {
-        if (Object.keys(selections).length === 0 && Object.keys(extras).length === 0 && status === 'Completed') {
-            return alert('Δεν έχεις επιλέξει καμία εργασία!');
+    const handleSave = async (statusArg = 'Completed') => {
+        if (Object.keys(selections).length === 0 && Object.keys(extras).length === 0 && statusArg === 'Completed') {
+            return showStatus('❌ Δεν έχεις επιλέξει καμία εργασία!', 'error');
         }
         setLoading(true);
 
@@ -188,7 +191,8 @@ function EmployeeApp() {
             mechanic: user.username,
             servicesPerformed,
             generalNotes: notes,
-            status: status === 'Temp' ? 'Pending' : 'Completed'
+            generalNotes: notes,
+            status: statusArg === 'Temp' ? 'Pending' : 'Completed'
         };
 
         try {
@@ -200,16 +204,24 @@ function EmployeeApp() {
                 },
                 body: JSON.stringify(payload)
             });
-            alert(status === 'Temp' ? 'Αποθηκεύτηκε προσωρινά!' : 'Ολοκληρώθηκε!');
+            showStatus(statusArg === 'Temp' ? '✅ Αποθηκεύτηκε προσωρινά!' : '✅ Ολοκληρώθηκε!');
             setEntryData({ plate: '', km: '', vin: '' }); setSelections({}); setExtras({}); setComments({});
             setCurrentServiceId(null);
             setView('entry');
-        } catch (e) { alert('Σφάλμα σύνδεσης.'); }
+        } catch (e) { showStatus('❌ Σφάλμα σύνδεσης.', 'error'); }
         finally { setLoading(false); }
     };
 
     if (!user) return (
-        <div className="min-h-screen bg-[#0f172a] flex items-center justify-center p-4">
+        <div className="min-h-screen bg-[#0f172a] flex items-center justify-center p-4 relative">
+            <AnimatePresence>
+                {status && (
+                    <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className={`fixed top-4 left-1/2 -translate-x-1/2 z-[100] p-4 rounded-xl shadow-2xl border ${status.type === 'success' ? 'bg-green-600 border-green-500' : 'bg-red-600 border-red-500'} text-white font-bold flex items-center gap-2 pointer-events-none`}>
+                        {status.type === 'success' ? <CheckCircle size={20} /> : <Wrench size={20} className="rotate-90" />}
+                        {status.text}
+                    </motion.div>
+                )}
+            </AnimatePresence>
             <div className="w-full max-w-sm bg-slate-900 p-8 rounded-2xl border border-slate-700 text-center">
                 <Wrench className="text-blue-500 w-12 h-12 mx-auto mb-4" />
                 <h1 className="text-2xl font-bold text-white mb-6">Service App</h1>
@@ -222,6 +234,14 @@ function EmployeeApp() {
 
     return (
         <div className="min-h-screen bg-[#0f172a] text-white flex flex-col relative">
+            <AnimatePresence>
+                {status && (
+                    <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className={`fixed top-4 left-1/2 -translate-x-1/2 z-[100] p-4 rounded-xl shadow-2xl border ${status.type === 'success' ? 'bg-green-600 border-green-500' : 'bg-red-600 border-red-500'} text-white font-bold flex items-center gap-2 pointer-events-none`}>
+                        {status.type === 'success' ? <CheckCircle size={20} /> : <Wrench size={20} className="rotate-90" />}
+                        {status.text}
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
 
 
@@ -257,7 +277,7 @@ function EmployeeApp() {
                             <div><label className="text-xs text-slate-500 font-bold ml-1 flex items-center gap-1"><Clock size={14} /> ΧΙΛΙΟΜΕΤΡΑ</label><input type="number" value={entryData.km} onChange={e => setEntryData({ ...entryData, km: e.target.value })} className="w-full bg-slate-950 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="0" /></div>
                             <div><label className="text-xs text-slate-500 font-bold ml-1 flex items-center gap-1"><FileText size={14} /> VIN (ΠΡΟΑΙΡΕΤΙΚΟ)</label><input value={entryData.vin} onChange={e => setEntryData({ ...entryData, vin: e.target.value.toUpperCase() })} className="w-full bg-slate-950 border border-slate-700 p-3 rounded-xl text-sm uppercase outline-none focus:border-blue-500" placeholder="Αρ. Πλαισίου" /></div>
 
-                            <button onClick={() => { if (!entryData.plate) return alert('Βάλε πινακίδα!'); setCurrentServiceId(null); setSelections({}); setExtras({}); setView('service'); }} className="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-bold text-lg mt-4 shadow-lg active:scale-95 transition-transform">ΕΝΑΡΞΗ ΝΕΑΣ</button>
+                            <button onClick={() => { if (!entryData.plate) return showStatus('❌ Βάλε πινακίδα!', 'error'); setCurrentServiceId(null); setSelections({}); setExtras({}); setView('service'); }} className="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-bold text-lg mt-4 shadow-lg active:scale-95 transition-transform">ΕΝΑΡΞΗ ΝΕΑΣ</button>
                         </div>
 
                         {pendingServices.length > 0 && (
