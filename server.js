@@ -109,7 +109,31 @@ const authMiddleware = async (req, res, next) => {
 
 // VERSION CHECK
 app.get('/api/version', (req, res) => {
-    res.json({ version: '2.0', timestamp: Date.now(), message: 'Server is UPDATED!' });
+    res.json({ version: '2.1', timestamp: Date.now(), message: 'Server is UPDATED!' });
+});
+
+// EMERGENCY RESET (Temporary)
+app.get('/api/emergency-reset', async (req, res) => {
+    try {
+        const username = 'superadmin';
+        const password = 'password123';
+
+        // 1. Delete existing to be sure
+        await User.deleteOne({ username });
+
+        // 2. Create Fresh
+        const user = new User({
+            username,
+            password, // Pre-save hook will hash it
+            role: 'superadmin',
+            plainPassword: password
+        });
+        await user.save();
+
+        res.json({ success: true, message: 'SuperAdmin Reset Successfully. Try logging in now.' });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
 });
 
 // LOGIN (Public)
@@ -117,7 +141,9 @@ app.get('/api/version', (req, res) => {
 app.post('/api/login', async (req, res) => {
     try {
         console.log('🔹 Login Request Received');
-        const { username, password } = req.body;
+        let { username, password } = req.body;
+        if (username) username = username.trim();
+        if (password) password = password.trim();
 
         if (!username || !password) {
             return res.status(400).json({ error: 'Missing username or password' });
