@@ -301,12 +301,12 @@ const GarageTab = ({ vehicles, refreshVehicles, theme, user }) => {
         if (!newCar.plateNumber) return alert("Βάλε πινακίδα!");
 
         // 1. Create Vehicle
-        await fetch(`${API_URL}/api/vehicles`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-user-id': user._id }, body: JSON.stringify(newCar) });
+        await fetch(`${API_URL}/api/vehicles`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` }, body: JSON.stringify(newCar) });
 
         // 2. Create Pending Service (Auto-Entrance)
         await fetch(`${API_URL}/api/services`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'x-user-id': user._id },
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
             body: JSON.stringify({
                 vehiclePlate: newCar.plateNumber,
                 mechanic: 'Reception',
@@ -323,7 +323,7 @@ const GarageTab = ({ vehicles, refreshVehicles, theme, user }) => {
     const handleDeleteCar = async (e, id) => {
         e.stopPropagation();
         if (deleteConfirmId === id) {
-            try { const res = await fetch(`${API_URL}/api/vehicles/${id}`, { method: 'DELETE', headers: { 'x-user-id': user._id } }); if (!res.ok) throw new Error(res.statusText); setDeleteConfirmId(null); refreshVehicles(); } catch (err) { console.error(err); alert('Error: ' + err.message); }
+            try { const res = await fetch(`${API_URL}/api/vehicles/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }); if (!res.ok) throw new Error(res.statusText); setDeleteConfirmId(null); refreshVehicles(); } catch (err) { console.error(err); alert('Error: ' + err.message); }
         } else {
             setDeleteConfirmId(id);
             setTimeout(() => setDeleteConfirmId(null), 3000);
@@ -335,7 +335,7 @@ const GarageTab = ({ vehicles, refreshVehicles, theme, user }) => {
         try {
             await fetch(`${API_URL}/api/services`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'x-user-id': user._id },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                 body: JSON.stringify({ _id: serviceId, vehiclePlate: plate, price: Number(quickPrice), partsCost: Number(quickCost), status: 'Completed' })
             });
             setEditingPriceServiceId(null);
