@@ -183,6 +183,26 @@ app.post('/api/admin/shops', authMiddleware, async (req, res) => {
     } catch (e) { console.error(e); res.status(500).json({ error: 'Creation Error' }); }
 });
 
+app.delete('/api/admin/shops/:id', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.role !== 'superadmin') return res.status(403).json({ error: 'Access Denied' });
+        const shopId = req.params.id;
+
+        // 1. Delete Shop
+        await Shop.findByIdAndDelete(shopId);
+
+        // 2. Delete Users of this Shop
+        await User.deleteMany({ shop: shopId });
+
+        // 3. Delete Data (Optional but recommended)
+        await Vehicle.deleteMany({ shop: shopId });
+        await ServiceRecord.deleteMany({ shop: shopId });
+        await Expense.deleteMany({ shop: shopId });
+
+        res.json({ success: true });
+    } catch (e) { res.status(500).json({ error: 'Delete Error' }); }
+});
+
 // SETTINGS (Protected)
 app.put('/api/settings/:userId', upload.fields([{ name: 'logo' }, { name: 'stamp' }]), async (req, res) => {
     try {

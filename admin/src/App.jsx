@@ -839,7 +839,20 @@ const SuperAdminTab = ({ theme }) => {
                         <p className="text-slate-400 text-sm mb-4">{shop.email}</p>
                         <div className="flex justify-between items-center text-xs text-slate-500 border-t border-slate-700 pt-3">
                             <span>Plan: <b className="text-purple-400">{shop.plan}</b></span>
-                            <span>Created: {new Date(shop.createdAt).toLocaleDateString('el-GR')}</span>
+                            <div className="flex items-center gap-2">
+                                <span>{new Date(shop.createdAt).toLocaleDateString('el-GR')}</span>
+                                <button
+                                    onClick={async () => {
+                                        if (confirm('⚠️ ΠΡΟΣΟΧΗ: Διαγραφή Συνεργείου;\nΘα διαγραφούν ΟΛΟΙ οι χρήστες και τα δεδομένα του!')) {
+                                            await fetch(`${API_URL}/api/admin/shops/${shop._id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
+                                            fetchShops();
+                                        }
+                                    }}
+                                    className="bg-red-900/40 text-red-400 p-1 rounded hover:bg-red-900 hover:text-white transition-colors"
+                                >
+                                    <Trash2 size={14} />
+                                </button>
+                            </div>
                         </div>
                     </div>
                 ))}
