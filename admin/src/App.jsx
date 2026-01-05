@@ -813,6 +813,8 @@ const SuperAdminTab = ({ theme }) => {
     const [shops, setShops] = useState([]);
     const [newShop, setNewShop] = useState({ name: '', email: '', password: '', plan: 'Basic', theme: 'default' });
     const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+    const nameInputRef = React.useRef(null);
+
 
     const fetchShops = async () => {
         try {
@@ -826,6 +828,8 @@ const SuperAdminTab = ({ theme }) => {
         } catch (e) { console.error('Error fetching shops:', e); setShops([]); }
     };
     useEffect(() => { fetchShops(); }, []);
+    useEffect(() => { if (nameInputRef.current) nameInputRef.current.focus(); }, [shops.length]);
+
 
     const handleCreateShop = async (e) => {
         e.preventDefault();
@@ -859,11 +863,12 @@ const SuperAdminTab = ({ theme }) => {
                 <h3 className="font-bold text-slate-300 border-b border-slate-700 pb-2">➕ Νέο Συνεργείο</h3>
                 <form onSubmit={handleCreateShop} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input
+                        ref={nameInputRef}
                         autoFocus
                         placeholder="Όνομα Συνεργείου"
                         value={newShop.name || ''}
                         onChange={e => handleInput('name', e.target.value)}
-                        className={`${t.input} border ${t.border} text-white p-3 rounded-lg`}
+                        className={`${t.input} border ${t.border} text-white p-3 rounded-lg relative z-10 pointer-events-auto`}
                         autoComplete="off"
                         required
                     />
@@ -871,7 +876,7 @@ const SuperAdminTab = ({ theme }) => {
                         placeholder="Email (Username)"
                         value={newShop.email || ''}
                         onChange={e => handleInput('email', e.target.value)}
-                        className={`${t.input} border ${t.border} text-white p-3 rounded-lg`}
+                        className={`${t.input} border ${t.border} text-white p-3 rounded-lg relative z-10 pointer-events-auto`}
                         autoComplete="new-password"
                         required
                     />
@@ -879,7 +884,7 @@ const SuperAdminTab = ({ theme }) => {
                         placeholder="Κωδικός Πρόσβασης"
                         value={newShop.password || ''}
                         onChange={e => handleInput('password', e.target.value)}
-                        className={`${t.input} border ${t.border} text-white p-3 rounded-lg`}
+                        className={`${t.input} border ${t.border} text-white p-3 rounded-lg relative z-10 pointer-events-auto`}
                         autoComplete="new-password"
                         required
                     />
