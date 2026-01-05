@@ -500,7 +500,7 @@ const UsersTab = ({ theme, user }) => {
         } catch (e) { alert('❌ Network Error'); }
     };
 
-    const handleEdit = (u) => { setEditingId(u._id); setFormData({ username: u.username, password: u.password, salary: u.salary, insurance: u.insurance }); };
+    const handleEdit = (u) => { setEditingId(u._id); setFormData({ username: u.username || '', password: u.plainPassword || '', salary: u.salary || '', insurance: u.insurance || '' }); };
     const handleCancel = () => { setEditingId(null); setFormData({ username: '', password: '', salary: '', insurance: '' }); };
     const handleDelete = async (id) => { if (!confirm('Διαγραφή;')) return; await fetch(`${API_URL}/api/users/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }); fetchUsers(); };
     const togglePass = (id) => { setVisiblePasswords(prev => ({ ...prev, [id]: !prev[id] })); };
@@ -511,7 +511,7 @@ const UsersTab = ({ theme, user }) => {
             <form onSubmit={handleSubmit} className={`${t.card} p-4 rounded-xl border ${t.border}`}>
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
                     <input placeholder="Username" value={formData.username} onChange={e => setFormData({ ...formData, username: e.target.value })} className={`${t.input} border ${t.border} text-white p-2 rounded`} />
-                    <input placeholder="Password" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} className={`${t.input} border ${t.border} text-white p-2 rounded`} />
+                    <input placeholder="Password (New)" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} className={`${t.input} border ${t.border} text-white p-2 rounded`} />
                     <input type="number" placeholder="Καθαρός Μισθός (€)" value={formData.salary} onChange={e => setFormData({ ...formData, salary: e.target.value })} className={`${t.input} border ${t.border} text-white p-2 rounded`} />
                     <input type="number" placeholder="Κόστος Ασφάλισης (€)" value={formData.insurance} onChange={e => setFormData({ ...formData, insurance: e.target.value })} className={`${t.input} border ${t.border} text-white p-2 rounded`} />
                     <div className="flex gap-2">
@@ -533,11 +533,11 @@ const UsersTab = ({ theme, user }) => {
 // 6. SETTINGS TAB
 const SettingsTab = ({ user, setUser, theme }) => {
     const t = theme || THEMES.default;
-    const [name, setName] = useState(user.shopName);
+    const [name, setName] = useState(user.shopName || '');
     const [logoFile, setLogoFile] = useState(null);
     const [stampFile, setStampFile] = useState(null);
-    const [previewUrl, setPreviewUrl] = useState(user.logoUrl);
-    const [stampPreview, setStampPreview] = useState(user.stampUrl);
+    const [previewUrl, setPreviewUrl] = useState(user.logoUrl || '');
+    const [stampPreview, setStampPreview] = useState(user.stampUrl || '');
     const [phones, setPhones] = useState(user.phones || []);
     const [website, setWebsite] = useState(user.website || '');
     const [newPhone, setNewPhone] = useState('');
