@@ -13,6 +13,10 @@ const Vehicle = require('./models/Vehicle');
 const ServiceRecord = require('./models/ServiceRecord');
 const Expense = require('./models/Expense');
 const RecurringExpense = require('./models/RecurringExpense');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+
+const JWT_SECRET = process.env.JWT_SECRET || 'geoter-secret-key-change-me';
 
 const app = express();
 
@@ -72,27 +76,33 @@ const normalizePlate = (text) => {
 
 // --- MIDDLEWARE: AUTH & ISOLATION ---
 const authMiddleware = async (req, res, next) => {
-    // For prototype: we will expect 'x-user-id' in headers
-    // In future: Validate JWT Token
-    const userId = req.headers['x-user-id'];
-    if (!userId) {
-        // Fallback for public/demo mode or superadmin dev
-        if (req.query.demo) return next();
-        return res.status(401).json({ error: 'Unauthorized: No User ID' });
+    const authHeader = req.headers['authorization'];
+
+    // Check for Bearer Token
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.split(' ')[1];
+        try {
+            const decoded = jwt.verify(token, JWT_SECRET);
+            const user = await User.findById(decoded.userId).populate('shop');
+            if (!user) return res.status(401).json({ error: 'User not found' });
+
+            req.user = user;
+            req.shopId = user.shop ? user.shop._id : null;
+            return next();
+        } catch (err) {
+            return res.status(401).json({ error: 'Invalid Token' });
+        }
     }
 
-    try {
-        const user = await User.findById(userId).populate('shop');
-        if (!user) return res.status(401).json({ error: 'User not found' });
+    // Fallback for transition/debug (Optional: Remove if strict)
+    // const userId = req.headers['x-user-id'];
+    // ... logic ...
 
-        req.user = user;
-        req.shopId = user.shop ? user.shop._id : null;
+    // If no token and no header (or invalid), deny.
+    // Allow public/demo if needed
+    if (req.query.demo) return next();
 
-        // Super Admin bypass isolation (optional) or restrict to own shop
-        next();
-    } catch (e) {
-        res.status(500).json({ error: 'Auth Error' });
-    }
+    return res.status(401).json({ error: 'Unauthorized: No Token' });
 };
 
 // --- API ROUTES ---
@@ -103,40 +113,39 @@ app.get('/api/version', (req, res) => {
 });
 
 // LOGIN (Public)
+// LOGIN (Public)
 app.post('/api/login', async (req, res) => {
     try {
         console.log('🔹 Login Request Received');
-        if (!req.body) {
-            console.error('❌ Request body is missing');
-            return res.status(400).json({ error: 'Missing Request Body' });
-        }
-
         const { username, password } = req.body;
-        console.log(`🔹 Login Attempt for: '${username}'`);
 
         if (!username || !password) {
             return res.status(400).json({ error: 'Missing username or password' });
         }
 
-        // Explicitly load Shop to ensure registration
-        const Shop = mongoose.model('Shop');
-
         const user = await User.findOne({ username }).populate('shop');
-        console.log('🔹 User DB Search Result:', user ? user.username : 'NULL');
-
         if (!user) return res.status(401).json({ success: false, message: 'User Not Found' });
 
-        console.log(`🔹 Password Check: Match? ${user.password === password}`);
-
-        if (user.password !== password) return res.status(401).json({ success: false, message: 'Wrong Password' });
+        // Verify Password
+        const isMatch = await user.comparePassword(password);
+        if (!isMatch) return res.status(401).json({ success: false, message: 'Wrong Password' });
 
         // Check Subscription
         if (user.shop && user.shop.status === 'Expired') {
-            console.log('❌ Subscription Expired');
             return res.status(403).json({ success: false, message: 'Subscription Expired' });
         }
+
+        // Generate Token
+        const token = jwt.sign(
+            { userId: user._id, shopId: user.shop ? user.shop._id : null, role: user.role },
+            JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+
         console.log('✅ Login Success!');
-        res.json({ success: true, user });
+        // Return User AND Token
+        res.json({ success: true, user, token });
+
     } catch (e) {
         console.error('🔥 CRITICAL LOGIN ERROR:', e);
         res.status(500).json({ error: 'Internal Server Error', details: e.message });

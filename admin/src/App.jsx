@@ -29,8 +29,8 @@ const ServiceHistoryModal = ({ vehicle, onClose, user }) => {
     const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const fetchHistory = async () => { try { const res = await fetch(`${API_URL}/api/services/history/${vehicle.plateNumber}`, { headers: { 'x-user-id': user._id } }); setHistory(await res.json()); } catch (err) { console.error(err); } finally { setLoading(false); } };
-    const handleDeleteRecord = async (recordId) => { if (!confirm('Διαγραφή;')) return; await fetch(`${API_URL}/api/services/${recordId}`, { method: 'DELETE', headers: { 'x-user-id': user._id } }); fetchHistory(); };
+    const fetchHistory = async () => { try { const res = await fetch(`${API_URL}/api/services/history/${vehicle.plateNumber}`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }); setHistory(await res.json()); } catch (err) { console.error(err); } finally { setLoading(false); } };
+    const handleDeleteRecord = async (recordId) => { if (!confirm('Διαγραφή;')) return; await fetch(`${API_URL}/api/services/${recordId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }); fetchHistory(); };
     useEffect(() => { fetchHistory(); }, []);
 
     return (
@@ -70,7 +70,7 @@ const ServiceHistoryModal = ({ vehicle, onClose, user }) => {
 // 2. MODAL ΕΠΕΞΕΡΓΑΣΙΑΣ ΟΧΗΜΑΤΟΣ
 const EditVehicleModal = ({ vehicle, onClose, onUpdate, user }) => {
     const [formData, setFormData] = useState({ ...vehicle });
-    const handleSubmit = async (e) => { e.preventDefault(); await fetch(`${API_URL}/api/vehicles/${vehicle._id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-user-id': user._id }, body: JSON.stringify(formData) }); onUpdate(); onClose(); };
+    const handleSubmit = async (e) => { e.preventDefault(); await fetch(`${API_URL}/api/vehicles/${vehicle._id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` }, body: JSON.stringify(formData) }); onUpdate(); onClose(); };
     return (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
             <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} className="bg-slate-900 w-full max-w-lg rounded-2xl border border-slate-700 p-6 shadow-2xl">
@@ -104,7 +104,7 @@ const MiniERPTab = ({ theme, user }) => {
     const [users, setUsers] = useState([]); // NEO: Users for salary
     const fetchData = async () => {
         if (!user) return;
-        const headers = { 'x-user-id': user._id };
+        const headers = { 'Authorization': `Bearer ${localStorage.getItem('token')}` };
         setServices(await (await fetch(`${API_URL}/api/services/completed`, { headers })).json());
         setExpenses(await (await fetch(`${API_URL}/api/expenses`, { headers })).json());
         setRecurring(await (await fetch(`${API_URL}/api/recurring-expenses`, { headers })).json());
@@ -114,29 +114,29 @@ const MiniERPTab = ({ theme, user }) => {
     const [newMonthly, setNewMonthly] = useState({ title: '', amount: '' }); // For Monthly
     const [deleteConfirmId, setDeleteConfirmId] = useState(null); // For UI Confirmation
 
-    const handleAddRecurring = async (e) => { e.preventDefault(); await fetch(`${API_URL}/api/recurring-expenses`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-user-id': user._id }, body: JSON.stringify(newRec) }); setNewRec({ title: '', amount: '' }); fetchData(); };
+    const handleAddRecurring = async (e) => { e.preventDefault(); await fetch(`${API_URL}/api/recurring-expenses`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` }, body: JSON.stringify(newRec) }); setNewRec({ title: '', amount: '' }); fetchData(); };
     const handleDeleteRecurring = async (id) => {
         if (deleteConfirmId === id) {
-            try { await fetch(`${API_URL}/api/recurring-expenses/${id}`, { method: 'DELETE', headers: { 'x-user-id': user._id } }); setDeleteConfirmId(null); fetchData(); } catch (e) { alert('Error deleting'); }
+            try { await fetch(`${API_URL}/api/recurring-expenses/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }); setDeleteConfirmId(null); fetchData(); } catch (e) { alert('Error deleting'); }
         } else {
             setDeleteConfirmId(id);
             setTimeout(() => setDeleteConfirmId(null), 3000); // Auto-cancel after 3s
         }
     };
-    const handleUpdateRecurring = async (id) => { await fetch(`${API_URL}/api/recurring-expenses/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-user-id': user._id }, body: JSON.stringify({ amount: Number(editAmount) }) }); setEditRecId(null); fetchData(); };
+    const handleUpdateRecurring = async (id) => { await fetch(`${API_URL}/api/recurring-expenses/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` }, body: JSON.stringify({ amount: Number(editAmount) }) }); setEditRecId(null); fetchData(); };
 
     const handleAddExpense = async (e) => {
-        e.preventDefault(); await fetch(`${API_URL}/api/expenses`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-user-id': user._id }, body: JSON.stringify({ ...newMonthly, date: new Date(selectedYear, selectedMonth, 1) }) }); setNewMonthly({ title: '', amount: '' }); fetchData();
+        e.preventDefault(); await fetch(`${API_URL}/api/expenses`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` }, body: JSON.stringify({ ...newMonthly, date: new Date(selectedYear, selectedMonth, 1) }) }); setNewMonthly({ title: '', amount: '' }); fetchData();
     };
     const handleDeleteExpense = async (id) => {
         if (deleteConfirmId === id) {
-            try { await fetch(`${API_URL}/api/expenses/${id}`, { method: 'DELETE', headers: { 'x-user-id': user._id } }); setDeleteConfirmId(null); fetchData(); } catch (e) { alert('Error deleting'); }
+            try { await fetch(`${API_URL}/api/expenses/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }); setDeleteConfirmId(null); fetchData(); } catch (e) { alert('Error deleting'); }
         } else {
             setDeleteConfirmId(id);
             setTimeout(() => setDeleteConfirmId(null), 3000); // Auto-cancel after 3s
         }
     };
-    const handleUpdateExpense = async (id) => { await fetch(`${API_URL}/api/expenses/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-user-id': user._id }, body: JSON.stringify({ amount: Number(editAmount) }) }); setEditExpId(null); fetchData(); };
+    const handleUpdateExpense = async (id) => { await fetch(`${API_URL}/api/expenses/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` }, body: JSON.stringify({ amount: Number(editAmount) }) }); setEditExpId(null); fetchData(); };
 
     // CALCULATIONS
     const isSameMonth = (d1, m, y) => { const d = new Date(d1); return d.getMonth() === m && d.getFullYear() === y; };
@@ -617,7 +617,7 @@ const SuperAdminTab = ({ theme }) => {
     const [newShop, setNewShop] = useState({ name: '', email: '', password: '', plan: 'Basic', theme: 'default' });
 
     const fetchShops = async () => {
-        try { const res = await fetch(`${API_URL}/api/admin/shops`); setShops(await res.json()); } catch (e) { }
+        try { const res = await fetch(`${API_URL}/api/admin/shops`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }); setShops(await res.json()); } catch (e) { }
     };
     useEffect(() => { fetchShops(); }, []);
 
@@ -626,7 +626,7 @@ const SuperAdminTab = ({ theme }) => {
         try {
             const res = await fetch(`${API_URL}/api/admin/shops`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                 body: JSON.stringify({
                     shopData: { name: newShop.name, email: newShop.email, password: newShop.password, plan: newShop.plan, theme: newShop.theme },
                     adminUser: { username: newShop.email, password: newShop.password }
@@ -692,7 +692,7 @@ const AdminDashboard = () => {
     const refreshVehicles = async () => {
         try {
             if (!user) return;
-            const res = await fetch(`${API_URL}/api/vehicles`, { headers: { 'x-user-id': user._id } });
+            const res = await fetch(`${API_URL}/api/vehicles`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } });
             if (res.ok) setVehicles(await res.json());
         } catch (e) { }
     };
@@ -720,6 +720,7 @@ const AdminDashboard = () => {
                 const userObj = data.user || data;
                 setUser(userObj);
                 localStorage.setItem('user', JSON.stringify(userObj));
+                localStorage.setItem('token', data.token); // SAVE TOKEN
             } else {
                 alert(`[LOGIN FAILED]\nStatus: ${res.status}\nMessage: ${data.message || data.error || 'Unknown Error'}`);
                 console.error('Login Fail:', data);

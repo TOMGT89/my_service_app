@@ -85,7 +85,10 @@ function EmployeeApp() {
         try {
             const res = await fetch(`${API_URL}/api/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(credentials) });
             const data = await res.json();
-            if (data.success && data.user.role === 'employee') setUser(data.user); else alert('Λάθος στοιχεία');
+            if (data.success && data.user.role === 'employee') {
+                setUser(data.user);
+                localStorage.setItem('token', data.token); // SAVE TOKEN
+            } else { alert('Λάθος στοιχεία'); }
         } catch (e) { alert('Δεν υπάρχει σύνδεση με τον Server.'); }
     };
 
@@ -96,7 +99,10 @@ function EmployeeApp() {
 
     const fetchPendingServices = async () => {
         try {
-            const res = await fetch(`${API_URL}/api/services/pending`);
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${API_URL}/api/services/pending`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
             const data = await res.json();
             setPendingServices(data);
         } catch (err) { console.error('Error fetching pending:', err); }
@@ -186,7 +192,14 @@ function EmployeeApp() {
         };
 
         try {
-            await fetch(`${API_URL}/api/services`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            await fetch(`${API_URL}/api/services`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify(payload)
+            });
             alert(status === 'Temp' ? 'Αποθηκεύτηκε προσωρινά!' : 'Ολοκληρώθηκε!');
             setEntryData({ plate: '', km: '', vin: '' }); setSelections({}); setExtras({}); setComments({});
             setCurrentServiceId(null);
