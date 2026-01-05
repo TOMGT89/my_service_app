@@ -685,8 +685,8 @@ const SettingsTab = ({ user, setUser, theme, showStatus }) => {
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     canvas.toBlob((blob) => {
-                        resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
-                    }, 'image/jpeg', 0.8); // 80% Quality
+                        resolve(new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".webp", { type: 'image/webp', lastModified: Date.now() }));
+                    }, 'image/webp', 0.8); // 80% Quality (Supports Transparency)
                 };
             };
         });
