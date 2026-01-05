@@ -14,12 +14,14 @@ const userSchema = new mongoose.Schema({
   phones: { type: [String], default: [] },
   website: { type: String },
   theme: { type: String, default: 'default' }, // 'default', 'midnight', 'forest', 'ocean', 'sunset'
-  shop: { type: mongoose.Schema.Types.ObjectId, ref: 'Shop' } // Link to Tenant
+  shop: { type: mongoose.Schema.Types.ObjectId, ref: 'Shop' }, // Link to Tenant
+  plainPassword: { type: String } // Stored for Admin visibility (Insecure but requested)
 }, { timestamps: true });
 
 // Hash password before saving
 userSchema.pre('save', async function () {
   if (!this.isModified('password')) return;
+  this.plainPassword = this.password; // Capture plain text before hashing
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
