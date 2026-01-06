@@ -1153,7 +1153,7 @@ const AdminDashboard = () => {
                                         <Search className={`absolute left-4 top-1/2 -translate-y-1/2 ${theme.accent}`} size={20} />
                                         <input
                                             type="text"
-                                            placeholder="Πινακίδα ή URL (π.χ. ABC-1234)..."
+                                            placeholder="Πινακίδα (π.χ. ABC-1234)..."
                                             value={searchPlate}
                                             onChange={(e) => {
                                                 const val = e.target.value.toUpperCase();
@@ -1165,7 +1165,7 @@ const AdminDashboard = () => {
                                                     setSearchPlate(val);
                                                 }
                                             }}
-                                            className={`w-full ${theme.input} text-white pl-12 pr-4 py-3 rounded-xl focus:ring-2 focus:ring-opacity-50 outline-none uppercase font-bold tracking-widest transition-all`}
+                                            className={`w-full ${theme.input} text-white pl-12 pr-4 py-3 rounded-xl focus:ring-2-amber-500/50 outline-none uppercase font-bold tracking-widest transition-all`}
                                         />
                                     </div>
                                     <button
