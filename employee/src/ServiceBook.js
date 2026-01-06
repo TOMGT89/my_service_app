@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { Phone, Globe, Download, ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react';
+import { Phone, Globe, Download, ChevronDown, ChevronUp, AlertTriangle, History, Wrench, FileText } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 import { API_URL } from './config';
 
@@ -71,146 +71,154 @@ const ServiceBook = () => {
 
     return (
         <div className="min-h-screen bg-slate-100 p-0 md:p-4 font-sans text-slate-800">
-            <div className="max-w-3xl mx-auto bg-white shadow-2xl md:rounded-2xl overflow-hidden min-h-screen md:min-h-0 flex flex-col" ref={contentRef}>
+            <div className="max-w-2xl mx-auto bg-white shadow-2xl md:rounded-2xl overflow-hidden min-h-screen md:min-h-0 flex flex-col" ref={contentRef}>
 
                 {/* HEADER */}
-                <div className="bg-[#1e293b] text-white p-8 relative overflow-hidden">
+                <div className="bg-[#1e293b] p-8 text-center relative overflow-hidden text-white">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 to-indigo-500"></div>
                     {/* Background Decoration */}
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl -mr-16 -mt-16"></div>
 
-                    <div className="relative z-10 flex flex-col items-center text-center">
-                        {settings?.logoUrl && <img src={settings.logoUrl} className="h-20 mb-4 object-contain filter drop-shadow-md" alt="Logo" />}
-                        <h1 className="text-2xl font-bold uppercase tracking-wider">{settings?.shopName || 'Service Book'}</h1>
-                        <p className="text-slate-400 text-sm mb-4">Ψηφιακό Βιβλίο Συντήρησης</p>
-
-                        <div className="inline-flex items-center gap-3 bg-white/10 px-6 py-2 rounded-xl backdrop-blur-sm border border-white/10">
-                            <span className="font-mono text-2xl font-bold text-blue-400 tracking-widest">{plate}</span>
-                            <div className="h-8 w-px bg-white/20"></div>
-                            <span className="text-sm text-slate-300">{vehicle?.brand} {vehicle?.model}</span>
-                        </div>
+                    {settings?.logoUrl && <img src={settings.logoUrl} className="h-16 mx-auto mb-4 object-contain filter drop-shadow-md" alt="Logo" />}
+                    <h1 className="text-2xl font-bold uppercase tracking-widest">{settings?.shopName || 'Συνεργείο'}</h1>
+                    <div className="mt-2 inline-block">
+                        <span className="text-blue-400 text-lg font-mono border border-white/10 px-6 py-1 rounded-lg bg-white/5 backdrop-blur-sm shadow-inner">
+                            {plate}
+                        </span>
                     </div>
-
                     <button onClick={handleDownloadPDF} data-html2canvas-ignore className="absolute top-4 right-4 bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors text-white" title="Λήψη PDF">
                         <Download size={20} />
                     </button>
                 </div>
 
-                {/* NEXT SERVICE INFO */}
+                {/* NEXT SERVICE CARD */}
                 {nextService && (
-                    <div className="bg-blue-50 border-b border-blue-100 p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
-                        <div className="absolute left-0 top-0 bottom-0 w-2 bg-blue-500"></div>
-                        <p className="text-blue-900/60 text-xs font-bold uppercase tracking-widest mb-1">ΕΠΟΜΕΝΟΣ ΕΛΕΓΧΟΣ</p>
-                        <div className="flex items-center gap-3 text-3xl font-black text-slate-800">
-                            {nextService.icon && <span className="text-red-500">{nextService.icon}</span>}
-                            <span className={nextService.color}>{nextService.msg}</span>
-                        </div>
-                        <p className="text-slate-500 text-xs mt-2">Βάσει της τελευταίας αλλαγής λαδιών</p>
+                    <div className="bg-blue-50 p-8 border-b border-blue-100 text-center relative overflow-hidden">
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div>
+                        <p className="text-blue-900/40 text-[10px] font-bold uppercase tracking-[0.2em] mb-2">ΚΑΤΑΣΤΑΣΗ ΣΥΝΤΗΡΗΣΗΣ</p>
+                        <h2 className={`text-3xl font-black ${nextService.color} tracking-tight`}>{nextService.msg}</h2>
+                        <p className="text-[10px] text-slate-400 mt-4 uppercase tracking-widest">Ψηφιακό Βιβλίο Service Geoter v2.0</p>
                     </div>
                 )}
 
-
-
-                {/* SERVICE HISTORY */}
+                {/* HISTORY LIST */}
                 <div className="p-0 md:p-6 flex-1 bg-white">
                     <div className="p-4 md:p-0">
-                        <h3 className="font-bold text-slate-800 text-lg mb-4 flex items-center gap-2">
-                            <span className="bg-blue-600 w-2 h-6 rounded-full"></span>
-                            Ιστορικό Εργασιών
+                        <h3 className="font-bold text-slate-800 uppercase text-sm tracking-widest flex items-center gap-2">
+                            <History size={16} className="text-blue-600" /> Ιστορικό Εργασιών
                         </h3>
                     </div>
 
                     <div className="space-y-4">
-                        {services.length === 0 && <div className="text-center py-10 bg-slate-50 rounded-xl border border-dashed border-slate-300"><p className="text-slate-400">Δεν υπάρχουν καταχωρημένες εργασίες.</p></div>}
+                        {services.length === 0 && <div className="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200 m-4 md:m-0"><p className="text-slate-400">Δεν υπάρχουν καταχωρημένες εργασίες.</p></div>}
 
-                        {services.map((srv, idx) => (
-                            <div key={srv._id} className="group border border-slate-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden bg-white">
-                                <button
-                                    onClick={() => setExpandedVisit(expandedVisit === srv._id ? null : srv._id)}
-                                    className="w-full p-5 flex justify-between items-center bg-white hover:bg-slate-50 transition-colors"
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <span className="bg-slate-100 text-slate-600 font-mono font-bold text-sm px-3 py-1 rounded border border-slate-200">#{services.length - idx}</span>
-                                        <div className="text-left">
-                                            <p className="font-bold text-lg text-slate-800">{new Date(srv.completedAt).toLocaleDateString('el-GR', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-                                            <p className="text-xs text-slate-500 font-medium tracking-wide">
-                                                {srv.generalNotes?.match(/ΧΛΜ: (\d+)/)?.[0] || 'ΧΛΜ: -'}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className={`p-2 rounded-full transition-transform duration-300 ${expandedVisit === srv._id ? 'bg-blue-50 text-blue-600 rotate-180' : 'bg-slate-50 text-slate-400'}`}>
-                                        <ChevronDown size={20} />
-                                    </div>
-                                </button>
+                        {services.map((srv, idx) => {
+                            const visitShop = srv.shop || settings;
+                            const isExpanded = expandedVisit === srv._id;
 
-                                {/* EXPANDED DETAILS */}
-                                {expandedVisit === srv._id && (
-                                    <div className="border-t border-slate-100 relative bg-slate-50/50">
-                                        {/* STAMP WATERMARK */}
-                                        {settings?.stampUrl && (
-                                            <div className="absolute right-10 top-10 opacity-10 pointer-events-none rotate-[-12deg]">
-                                                <img src={settings.stampUrl} className="w-48 grayscale contrast-125" alt="Stamp" />
+                            return (
+                                <div key={srv._id} className="bg-white md:rounded-2xl md:border border-slate-100 overflow-hidden shadow-sm hover:shadow-md transition-all group border-b last:border-b-0">
+                                    <button
+                                        onClick={() => setExpandedVisit(isExpanded ? null : srv._id)}
+                                        className={`w-full p-5 flex justify-between items-center transition-colors ${isExpanded ? 'bg-slate-50' : 'hover:bg-slate-50/50'}`}
+                                        data-html2canvas-ignore
+                                    >
+                                        <div className="text-left flex items-center gap-4">
+                                            <div className={`p-3 rounded-xl ${isExpanded ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-100 text-blue-600'}`}>
+                                                <History size={18} />
                                             </div>
-                                        )}
+                                            <div>
+                                                <p className="font-bold text-slate-800 text-lg">{new Date(srv.completedAt).toLocaleDateString('el-GR')}</p>
+                                                <p className="text-xs text-slate-500 font-mono italic">
+                                                    {srv.generalNotes?.match(/ΧΛΜ: (\d+)/)?.[0] || 'N/A'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <div className="hidden md:block text-right">
+                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{visitShop.name}</p>
+                                            </div>
+                                            <div className={`transition-transform duration-300 ${isExpanded ? 'rotate-180 text-blue-600' : 'text-slate-400'}`}>
+                                                <ChevronDown size={20} />
+                                            </div>
+                                        </div>
+                                    </button>
 
-                                        <div className="p-6 space-y-6 relative z-10">
-                                            {srv.servicesPerformed.map((cat, i) => (
-                                                <div key={i}>
-                                                    <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 border-b border-slate-200 pb-1">{cat.categoryTitle}</h4>
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                                        {cat.items.map((item, j) => (
-                                                            <div key={j} className="flex items-center justify-between text-sm bg-white p-2 rounded border border-slate-100 shadow-sm">
-                                                                <span className="text-slate-700 font-medium">{item.name}</span>
-                                                                <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded ${item.action.includes('ΑΛΛΑΓΗ') ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>{item.action}</span>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            ))}
-
-                                            {srv.generalNotes && (
-                                                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg mt-4">
-                                                    <p className="text-xs font-bold text-yellow-700 uppercase mb-1">Σημειωσεις</p>
-                                                    <p className="text-sm text-yellow-900 italic whitespace-pre-wrap leading-relaxed">{srv.generalNotes}</p>
-                                                </div>
+                                    {/* DETAILS */}
+                                    <div className={`${isExpanded ? 'block' : 'hidden print:block'} border-t border-slate-100 relative`}>
+                                        <div className="p-6 relative">
+                                            {/* STAMP */}
+                                            {visitShop.stampUrl && (
+                                                <img
+                                                    src={visitShop.stampUrl}
+                                                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 opacity-[0.08] pointer-events-none grayscale mix-blend-multiply"
+                                                    alt="Stamp"
+                                                />
                                             )}
 
-                                            {/* STAMP VISIBLE FOR PDF */}
-                                            <div className="flex justify-end mt-8 pt-8 border-t border-slate-200/50">
-                                                <div className="text-center">
-                                                    {settings?.stampUrl ? (
-                                                        <img src={settings.stampUrl} className="w-32 opacity-80 mix-blend-multiply transform rotate-[-5deg]" alt="Stamp" />
-                                                    ) : (
-                                                        <div className="w-32 h-12 border-2 border-slate-300 border-dashed rounded flex items-center justify-center text-xs text-slate-400">Σφραγίδα</div>
-                                                    )}
-                                                    <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">Υπογραφη / Σφραγιδα</p>
+                                            <div className="space-y-6 relative z-10">
+                                                <div className="hidden print:flex items-center justify-between border-b border-slate-200 pb-2 mb-4">
+                                                    <span className="font-bold text-lg text-slate-800">Επίσκεψη: {new Date(srv.completedAt).toLocaleDateString()}</span>
+                                                    <span className="text-sm font-bold text-blue-600 uppercase italic">{visitShop.name}</span>
+                                                </div>
+
+                                                {srv.servicesPerformed.map((cat, i) => (
+                                                    <div key={i} className="space-y-3">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="w-1.5 h-6 rounded-full bg-blue-500"></span>
+                                                            <span className="font-bold text-[11px] text-slate-500 uppercase tracking-widest">{cat.categoryTitle}</span>
+                                                        </div>
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                                            {cat.items.map((item, j) => (
+                                                                <div key={j} className="text-sm text-slate-700 flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-100 shadow-sm">
+                                                                    <span className="font-medium">{item.name}</span>
+                                                                    <span className={`font-bold text-[9px] px-2 py-0.5 rounded uppercase tracking-tighter ${item.action === 'ΑΛΛΑΓΗ' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                                                                        {item.action}
+                                                                    </span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                ))}
+
+                                                {srv.generalNotes && (
+                                                    <div className="mt-6 p-4 bg-slate-50 border-l-4 border-slate-300 rounded-r-xl text-sm text-slate-600 leading-relaxed italic">
+                                                        <span className="font-bold text-slate-800 not-italic block mb-1 uppercase text-[10px] tracking-widest">Σημειώσεις Μηχανικού:</span>
+                                                        {srv.generalNotes}
+                                                    </div>
+                                                )}
+
+                                                <div className="hidden print:flex justify-end mt-8 pt-4 border-t border-slate-100">
+                                                    <div className="text-center">
+                                                        {visitShop.stampUrl && <img src={visitShop.stampUrl} className="w-24 opacity-90 mix-blend-multiply rotate-[-3deg]" alt="Stamp" />}
+                                                        <p className="text-[8px] text-slate-400 font-bold uppercase mt-1">Σφραγίδα {visitShop.name}</p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                )}
-                            </div>
-                        ))}
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
 
                 {/* FOOTER */}
-                <div className="bg-[#1e293b] p-6 text-white mt-auto print:hidden">
-                    <div className="flex flex-wrap justify-center gap-4">
-                        {settings?.phones?.map(phone => (
-                            <a key={phone} href={`tel:${phone}`} className="flex items-center gap-3 bg-white/5 hover:bg-white/10 px-6 py-3 rounded-xl transition-all border border-white/10 group">
-                                <div className="bg-green-500/20 text-green-400 p-2 rounded-full group-hover:scale-110 transition-transform"><Phone size={20} /></div>
-                                <span className="font-bold tracking-wider">{phone}</span>
-                            </a>
-                        ))}
-                        {settings?.website && (
-                            <a href={settings.website} target="_blank" rel="noreferrer" className="flex items-center gap-3 bg-white/5 hover:bg-white/10 px-6 py-3 rounded-xl transition-all border border-white/10 group">
-                                <div className="bg-blue-500/20 text-blue-400 p-2 rounded-full group-hover:scale-110 transition-transform"><Globe size={20} /></div>
-                                <span className="font-bold tracking-wider">Website</span>
-                            </a>
-                        )}
-                    </div>
-                    <p className="text-center text-slate-500 text-xs mt-6">Powered by Geoter Service App</p>
+                <div className="bg-[#1e293b] p-8 text-white mt-auto print:hidden flex flex-wrap justify-center gap-6 border-t border-slate-200">
+                    {settings?.phones?.map(phone => (
+                        <a key={phone} href={`tel:${phone}`} className="flex items-center gap-3 bg-white/5 hover:bg-white/10 px-6 py-3 rounded-xl transition-all border border-white/10 text-white no-underline">
+                            <div className="bg-green-500/20 p-2 rounded-full text-green-400"><Phone size={20} /></div>
+                            <span className="font-bold tracking-wider">{phone}</span>
+                        </a>
+                    ))}
+                    {settings?.website && (
+                        <a href={settings.website} target="_blank" rel="noreferrer" className="flex items-center gap-3 bg-white/5 hover:bg-white/10 px-6 py-3 rounded-xl transition-all border border-white/10 text-white no-underline">
+                            <div className="bg-blue-500/20 p-2 rounded-full text-blue-400"><Globe size={20} /></div>
+                            <span className="font-bold uppercase tracking-widest">Website</span>
+                        </a>
+                    )}
                 </div>
+                <p className="text-center text-slate-500 text-[10px] py-4 print:block hidden">Powered by Geoter Service App</p>
             </div>
         </div>
     );

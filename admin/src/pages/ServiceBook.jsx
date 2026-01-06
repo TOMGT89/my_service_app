@@ -37,7 +37,7 @@ const ServiceBook = ({ providedPlate }) => {
             )
         );
 
-        if (!lastOilChange) return { msg: 'Προτείνεται Έλεγχος', color: 'text-orange-400' };
+        if (!lastOilChange) return { msg: 'Προτείνεται Έλεγχος', color: 'text-orange-600' };
 
         const lastKmMatch = lastOilChange.generalNotes?.match(/ΧΛΜ: (\d+)/);
         const lastKm = lastKmMatch ? parseInt(lastKmMatch[1]) : 0;
@@ -55,7 +55,7 @@ const ServiceBook = ({ providedPlate }) => {
             date: nextDate.toLocaleDateString(),
             isOverdue,
             msg: isOverdue ? 'ΕΚΠΡΟΘΕΣΜΟ!' : `Επόμενο: ${nextKm} χλμ ή ${nextDate.toLocaleDateString()}`,
-            color: isOverdue ? 'text-red-500' : 'text-emerald-400'
+            color: isOverdue ? 'text-red-600' : 'text-green-600'
         };
     };
 
@@ -79,16 +79,19 @@ const ServiceBook = ({ providedPlate }) => {
     const { settings, services } = data;
 
     return (
-        <div className="bg-[#0a0a0f] p-4 font-sans text-gray-300">
-            <div className="max-w-2xl mx-auto bg-[#12121a]/80 backdrop-blur-xl shadow-2xl rounded-2xl overflow-hidden border border-amber-900/20" ref={contentRef}>
+        <div className="bg-slate-100 p-0 md:p-4 font-sans text-slate-800">
+            <div className="max-w-2xl mx-auto bg-white shadow-2xl md:rounded-2xl overflow-hidden border border-slate-200" ref={contentRef}>
 
                 {/* HEADER */}
-                <div className="bg-[#0d0d14]/95 p-8 text-center relative border-b border-amber-900/20">
-                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-600 to-yellow-500 opacity-50"></div>
-                    {settings?.logoUrl && <img src={settings.logoUrl} className="h-16 mx-auto mb-4 object-contain" alt="Logo" />}
-                    <h1 className="text-2xl font-bold uppercase tracking-widest text-white">{settings?.shopName || 'Συνεργείο'}</h1>
+                <div className="bg-[#1e293b] p-8 text-center relative overflow-hidden text-white">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 to-indigo-500"></div>
+                    {/* Background Decoration */}
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl -mr-16 -mt-16"></div>
+
+                    {settings?.logoUrl && <img src={settings.logoUrl} className="h-16 mx-auto mb-4 object-contain filter drop-shadow-md" alt="Logo" />}
+                    <h1 className="text-2xl font-bold uppercase tracking-widest">{settings?.shopName || 'Συνεργείο'}</h1>
                     <div className="mt-2 inline-block">
-                        <span className="text-amber-500 text-lg font-mono border border-amber-900/30 px-6 py-1 rounded-lg bg-black/50 shadow-inner">
+                        <span className="text-blue-400 text-lg font-mono border border-white/10 px-6 py-1 rounded-lg bg-white/5 backdrop-blur-sm shadow-inner">
                             {plate}
                         </span>
                     </div>
@@ -97,12 +100,13 @@ const ServiceBook = ({ providedPlate }) => {
                             href={`https://peppy-crostata-98bbc1.netlify.app/book/${plate}`}
                             target="_blank"
                             rel="noreferrer"
-                            className="bg-white/5 p-2 rounded-xl hover:bg-white/10 transition-colors text-white border border-white/10"
+                            className="bg-white/10 p-2 rounded-xl hover:bg-white/20 transition-colors text-white border border-white/10"
                             title="Άνοιγμα Δημόσιας Σελίδας"
+                            data-html2canvas-ignore
                         >
                             <Globe size={20} />
                         </a>
-                        <button onClick={handleDownloadPDF} className="bg-white/5 p-2 rounded-xl hover:bg-white/10 transition-colors text-white border border-white/10" title="Λήψη PDF">
+                        <button onClick={handleDownloadPDF} className="bg-white/10 p-2 rounded-xl hover:bg-white/20 transition-colors text-white border border-white/10" title="Λήψη PDF" data-html2canvas-ignore>
                             <Download size={20} />
                         </button>
                     </div>
@@ -110,120 +114,147 @@ const ServiceBook = ({ providedPlate }) => {
 
                 {/* NEXT SERVICE CARD */}
                 {nextService && (
-                    <div className="bg-amber-900/10 p-8 border-b border-amber-900/20 text-center">
-                        <p className="text-amber-500/60 text-[10px] font-bold uppercase tracking-[0.2em] mb-2 text-glow-amber">ΚΑΤΑΣΤΑΣΗ SERVICE</p>
+                    <div className="bg-blue-50 p-8 border-b border-blue-100 text-center relative overflow-hidden">
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div>
+                        <p className="text-blue-900/40 text-[10px] font-bold uppercase tracking-[0.2em] mb-2">ΚΑΤΑΣΤΑΣΗ ΣΥΝΤΗΡΗΣΗΣ</p>
                         <h2 className={`text-3xl font-black ${nextService.color} tracking-tight`}>{nextService.msg}</h2>
-                        <p className="text-[10px] text-gray-600 mt-4 uppercase tracking-widest">Σύστημα αυτόματης πρόβλεψης Geoter v2.0</p>
+                        <p className="text-[10px] text-slate-400 mt-4 uppercase tracking-widest">Ψηφιακό Βιβλίο Service Geoter v2.0</p>
                     </div>
                 )}
 
                 {/* HISTORY LIST */}
-                <div className="p-6 space-y-6">
-                    <h3 className="font-bold text-gray-400 ml-2 uppercase text-xs tracking-widest flex items-center gap-2">
-                        <History size={14} className="text-amber-500" /> Ιστορικό Εργασιών
-                    </h3>
+                <div className="p-0 md:p-6 space-y-6">
+                    <div className="p-4 md:p-0">
+                        <h3 className="font-bold text-slate-800 uppercase text-sm tracking-widest flex items-center gap-2">
+                            <History size={16} className="text-blue-600" /> Ιστορικό Εργασιών
+                        </h3>
+                    </div>
 
                     {services.length === 0 && (
-                        <div className="text-center py-12 bg-black/20 rounded-2xl border border-dashed border-gray-800">
-                            <FileText className="mx-auto text-gray-700 mb-3" size={32} />
-                            <p className="text-gray-600 text-sm">Δεν υπάρχουν καταχωρημένες εργασίες.</p>
+                        <div className="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200 m-4 md:m-0">
+                            <FileText className="mx-auto text-slate-300 mb-3" size={32} />
+                            <p className="text-slate-400 text-sm">Δεν υπάρχουν καταχωρημένες εργασίες.</p>
                         </div>
                     )}
 
                     <div className="space-y-4">
-                        {services.map((srv) => (
-                            <div key={srv._id} className="bg-black/20 rounded-2xl border border-white/5 overflow-hidden transition-all hover:border-amber-500/20 group">
-                                <button
-                                    onClick={() => setExpandedVisit(expandedVisit === srv._id ? null : srv._id)}
-                                    className={`w-full p-5 flex justify-between items-center transition-colors ${expandedVisit === srv._id ? 'bg-amber-900/20' : 'hover:bg-white/5'}`}
-                                >
-                                    <div className="text-left flex items-center gap-4">
-                                        <div className={`p-3 rounded-xl ${expandedVisit === srv._id ? 'bg-amber-600 text-black shadow-lg shadow-amber-900/30' : 'bg-gray-900 text-amber-500 group-hover:text-amber-400'}`}>
-                                            <Wrench size={18} />
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-white text-lg">{new Date(srv.completedAt).toLocaleDateString()}</p>
-                                            <p className="text-xs text-gray-500 font-mono italic">
-                                                {srv.generalNotes?.match(/ΧΛΜ: (\d+)/)?.[0] || 'N/A'}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className={`transition-transform duration-300 ${expandedVisit === srv._id ? 'rotate-180 text-amber-500' : 'text-gray-600'}`}>
-                                        <ChevronDown size={20} />
-                                    </div>
-                                </button>
+                        {services.map((srv, idx) => {
+                            const visitShop = srv.shop || settings; // Fallback to global if single-shop data
+                            const isExpanded = expandedVisit === srv._id;
 
-                                <AnimatePresence>
-                                    {expandedVisit === srv._id && (
-                                        <motion.div
-                                            initial={{ height: 0, opacity: 0 }}
-                                            animate={{ height: 'auto', opacity: 1 }}
-                                            exit={{ height: 0, opacity: 0 }}
-                                            className="bg-[#0d0d14]/50 border-t border-white/5 relative"
-                                        >
-                                            <div className="p-6 relative">
-                                                {/* ΣΦΡΑΓΙΔΑ ΣΤΟ ΦΟΝΤΟ */}
-                                                {settings?.stampUrl && (
-                                                    <img src={settings.stampUrl} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 opacity-[0.03] pointer-events-none grayscale" alt="Stamp" />
-                                                )}
-
-                                                <div className="space-y-6 relative z-10">
-                                                    {srv.servicesPerformed.map((cat, i) => (
-                                                        <div key={i} className="space-y-3">
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></span>
-                                                                <span className="font-bold text-[10px] text-amber-500 uppercase tracking-widest">{cat.categoryTitle}</span>
-                                                            </div>
-                                                            <div className="grid grid-cols-1 gap-2 ml-3">
-                                                                {cat.items.map((item, j) => (
-                                                                    <div key={j} className="text-sm text-gray-300 flex justify-between items-center group/item hover:bg-white/5 p-2 rounded-lg transition-colors border border-transparent hover:border-white/5">
-                                                                        <span className="flex items-center gap-2">
-                                                                            <span className="text-gray-600">•</span>
-                                                                            {item.name}
-                                                                        </span>
-                                                                        <span className="font-black text-[9px] bg-black/50 border border-white/10 px-2 py-0.5 rounded uppercase text-gray-400 tracking-tighter">
-                                                                            {item.action}
-                                                                        </span>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                                {srv.generalNotes && (
-                                                    <div className="mt-6 p-4 bg-amber-900/10 border border-amber-900/20 rounded-xl text-xs text-amber-200/70 leading-relaxed italic">
-                                                        <span className="font-bold text-amber-500 not-italic block mb-1">Σημειώσεις Μηχανικού:</span>
-                                                        {srv.generalNotes}
-                                                    </div>
-                                                )}
+                            return (
+                                <div key={srv._id} className="bg-white md:rounded-2xl md:border border-slate-100 overflow-hidden shadow-sm hover:shadow-md transition-all group border-b last:border-b-0">
+                                    <button
+                                        onClick={() => setExpandedVisit(isExpanded ? null : srv._id)}
+                                        className={`w-full p-5 flex justify-between items-center transition-colors ${isExpanded ? 'bg-slate-50' : 'hover:bg-slate-50/50'}`}
+                                        data-html2canvas-ignore
+                                    >
+                                        <div className="text-left flex items-center gap-4">
+                                            <div className={`p-3 rounded-xl ${isExpanded ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-100 text-blue-600'}`}>
+                                                <Wrench size={18} />
                                             </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-                        ))}
+                                            <div>
+                                                <p className="font-bold text-slate-800 text-lg">{new Date(srv.completedAt).toLocaleDateString()}</p>
+                                                <p className="text-xs text-slate-500 font-mono italic">
+                                                    {srv.generalNotes?.match(/ΧΛΜ: (\d+)/)?.[0] || 'N/A'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <div className="hidden md:block text-right">
+                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{visitShop.shopName}</p>
+                                            </div>
+                                            <div className={`transition-transform duration-300 ${isExpanded ? 'rotate-180 text-blue-600' : 'text-slate-400'}`}>
+                                                <ChevronDown size={20} />
+                                            </div>
+                                        </div>
+                                    </button>
+
+                                    {/* ALWAYS EXPANDED FOR PRINT OR WHEN CLICKED */}
+                                    <div className={`${isExpanded ? 'block' : 'hidden print:block'} border-t border-slate-100 relative`}>
+                                        <div className="p-6 relative">
+                                            {/* ΣΦΡΑΓΙΔΑ ΣΤΟ ΦΟΝΤΟ */}
+                                            {visitShop.stampUrl && (
+                                                <img
+                                                    src={visitShop.stampUrl}
+                                                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 opacity-[0.08] pointer-events-none grayscale mix-blend-multiply"
+                                                    alt="Stamp"
+                                                />
+                                            )}
+
+                                            <div className="space-y-6 relative z-10">
+                                                {/* Header for individual visit in PDF */}
+                                                <div className="hidden print:flex items-center justify-between border-b border-slate-200 pb-2 mb-4">
+                                                    <span className="font-bold text-lg text-slate-800">Επίσκεψη: {new Date(srv.completedAt).toLocaleDateString()}</span>
+                                                    <span className="text-sm font-bold text-blue-600 uppercase italic">{visitShop.shopName}</span>
+                                                </div>
+
+                                                {srv.servicesPerformed.map((cat, i) => (
+                                                    <div key={i} className="space-y-3">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="w-1.5 h-6 rounded-full bg-blue-500"></span>
+                                                            <span className="font-bold text-[11px] text-slate-500 uppercase tracking-widest">{cat.categoryTitle}</span>
+                                                        </div>
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                                            {cat.items.map((item, j) => (
+                                                                <div key={j} className="text-sm text-slate-700 flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-100 shadow-sm">
+                                                                    <span className="font-medium">{item.name}</span>
+                                                                    <span className={`font-bold text-[9px] px-2 py-0.5 rounded uppercase tracking-tighter ${item.action === 'ΑΛΛΑΓΗ' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                                                                        {item.action}
+                                                                    </span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            {srv.generalNotes && (
+                                                <div className="mt-6 p-4 bg-slate-50 border-l-4 border-slate-300 rounded-r-xl text-sm text-slate-600 leading-relaxed italic">
+                                                    <span className="font-bold text-slate-800 not-italic block mb-1 uppercase text-[10px] tracking-widest">Σημειώσεις Μηχανικού:</span>
+                                                    {srv.generalNotes}
+                                                </div>
+                                            )}
+
+                                            {/* STAMP IN PDF FOOTER PER VISIT */}
+                                            <div className="hidden print:flex justify-end mt-8 pt-4 border-t border-slate-100">
+                                                <div className="text-center">
+                                                    {visitShop.stampUrl ? (
+                                                        <img src={visitShop.stampUrl} className="w-24 opacity-90 mix-blend-multiply rotate-[-3deg]" alt="Stamp" />
+                                                    ) : (
+                                                        <div className="w-24 h-12 border-2 border-slate-200 border-dashed rounded flex items-center justify-center text-[10px] text-slate-300">ΣΦΡΑΓΙΔΑ</div>
+                                                    )}
+                                                    <p className="text-[8px] text-slate-400 font-bold uppercase mt-1">Σφραγίδα {visitShop.shopName}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
 
                 {/* FOOTER CONTACT */}
-                <div className="bg-[#0d0d14] p-8 border-t border-amber-900/20 flex flex-wrap justify-around items-center gap-6 print:hidden mt-auto">
+                <div className="bg-[#1e293b] p-8 border-t border-slate-200 flex flex-wrap justify-center gap-6 print:hidden mt-auto">
                     {settings?.phones?.map(phone => (
-                        <a key={phone} href={`tel:${phone}`} className="flex flex-col items-center text-gray-400 gap-2 active:scale-95 transition-all no-underline hover:text-white group">
-                            <div className="bg-emerald-600/20 p-4 rounded-2xl group-hover:bg-emerald-600 group-hover:text-black transition-all border border-emerald-500/20 group-hover:shadow-lg group-hover:shadow-emerald-900/20">
-                                <Phone size={24} />
+                        <a key={phone} href={`tel:${phone}`} className="flex items-center gap-3 bg-white/5 hover:bg-white/10 px-6 py-3 rounded-xl transition-all border border-white/10 text-white no-underline">
+                            <div className="bg-emerald-500/20 p-2 rounded-full text-emerald-400">
+                                <Phone size={20} />
                             </div>
-                            <span className="text-xs font-bold font-mono tracking-tighter">{phone}</span>
+                            <span className="font-bold tracking-wider">{phone}</span>
                         </a>
                     ))}
                     {settings?.website && (
-                        <a href={settings.website} target="_blank" rel="noreferrer" className="flex flex-col items-center text-gray-400 gap-2 active:scale-95 transition-all no-underline hover:text-white group">
-                            <div className="bg-amber-600/20 p-4 rounded-2xl group-hover:bg-amber-600 group-hover:text-black transition-all border border-amber-500/20 group-hover:shadow-lg group-hover:shadow-amber-900/20">
-                                <Globe size={24} />
+                        <a href={settings.website} target="_blank" rel="noreferrer" className="flex items-center gap-3 bg-white/5 hover:bg-white/10 px-6 py-3 rounded-xl transition-all border border-white/10 text-white no-underline">
+                            <div className="bg-blue-500/20 p-2 rounded-full text-blue-400">
+                                <Globe size={20} />
                             </div>
-                            <span className="text-xs font-bold uppercase tracking-widest">Website</span>
+                            <span className="font-bold uppercase tracking-widest">Website</span>
                         </a>
                     )}
                 </div>
+                <p className="text-center text-slate-500 text-[10px] py-4 print:block hidden">Powered by Geoter Service App</p>
             </div>
         </div>
     );

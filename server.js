@@ -396,9 +396,12 @@ app.get('/api/public/book/:plate', async (req, res) => {
         const vehicle = await Vehicle.findOne({ plateNumber: req.params.plate }).lean();
         if (!vehicle) return res.status(404).json({ error: 'Vehicle not found' });
 
-        const services = await ServiceRecord.find({ vehiclePlate: req.params.plate, status: 'Completed' }).sort({ date: -1 });
+        // Populate shop details for EACH service record
+        const services = await ServiceRecord.find({ vehiclePlate: req.params.plate, status: 'Completed' })
+            .sort({ date: -1 })
+            .populate('shop', 'name phones website logoUrl stampUrl theme');
 
-        // Find Shop directly (Primary source for public metadata)
+        // Find current Shop of the vehicle (for header metadata)
         const shop = await Shop.findById(vehicle.shop);
 
         res.json({
@@ -413,7 +416,10 @@ app.get('/api/public/book/:plate', async (req, res) => {
                 theme: shop.theme
             } : {}
         });
-    } catch (e) { res.status(500).json({ error: 'Error' }); }
+    } catch (e) {
+        console.error('Public Book Error:', e);
+        res.status(500).json({ error: 'Error' });
+    }
 });
 
 // --- STATIC FILES (EMPLOYEE APP & CLIENT BOOK) ---
