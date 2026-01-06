@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Phone, Globe, Download, ChevronDown, ChevronUp } from 'lucide-react';
+import { Phone, Globe, Download, ChevronDown, ChevronUp, Loader2, History, Wrench, FileText } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import html2pdf from 'html2pdf.js';
 
 const ServiceBook = ({ providedPlate }) => {
