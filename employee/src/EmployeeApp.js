@@ -66,7 +66,7 @@ function EmployeeApp() {
     const [pendingServices, setPendingServices] = useState([]);
     const [currentServiceId, setCurrentServiceId] = useState(null);
 
-    const [entryData, setEntryData] = useState({ plate: '', km: '', vin: '' });
+    const [entryData, setEntryData] = useState({ plate: '', km: '' });
 
     const [selections, setSelections] = useState({});
     const [comments, setComments] = useState({});
@@ -123,12 +123,9 @@ function EmployeeApp() {
     const handleContinueService = (service) => {
         setCurrentServiceId(service._id);
         const kmMatch = service.generalNotes?.match(/ΧΛΜ: (\d+)/);
-        const vinMatch = service.generalNotes?.match(/VIN: ([A-Z0-9]+)/);
-
         setEntryData({
             plate: service.vehiclePlate,
-            km: kmMatch ? kmMatch[1] : '',
-            vin: vinMatch ? vinMatch[1] : ''
+            km: kmMatch ? kmMatch[1] : ''
         });
 
         const newSelections = {};
@@ -180,7 +177,7 @@ function EmployeeApp() {
             if (items.length > 0) servicesPerformed.push({ categoryTitle: sec.title, items });
         });
 
-        let notes = `ΧΛΜ: ${entryData.km} | VIN: ${entryData.vin}\n`;
+        let notes = `ΧΛΜ: ${entryData.km}\n`;
         Object.keys(comments).forEach(secId => {
             if (comments[secId]) notes += `[${SECTIONS.find(s => s.id === secId).title}]: ${comments[secId]}\n`;
         });
@@ -205,7 +202,7 @@ function EmployeeApp() {
                 body: JSON.stringify(payload)
             });
             showStatus(statusArg === 'Temp' ? '✅ Αποθηκεύτηκε προσωρινά!' : '✅ Ολοκληρώθηκε!');
-            setEntryData({ plate: '', km: '', vin: '' }); setSelections({}); setExtras({}); setComments({});
+            setEntryData({ plate: '', km: '' }); setSelections({}); setExtras({}); setComments({});
             setCurrentServiceId(null);
             setView('entry');
         } catch (e) { showStatus('❌ Σφάλμα σύνδεσης.', 'error'); }
@@ -277,7 +274,6 @@ function EmployeeApp() {
                             </div>
 
                             <div><label className="text-xs text-gray-500 font-bold ml-1 flex items-center gap-1"><Clock size={14} className="text-amber-400" /> ΧΙΛΙΟΜΕΤΡΑ</label><input type="number" value={entryData.km} onChange={e => setEntryData({ ...entryData, km: e.target.value })} className="w-full bg-[#0a0a0f] border border-[#1a1a25] p-3 rounded-xl outline-none focus:border-amber-500/50 transition-colors" placeholder="0" /></div>
-                            <div><label className="text-xs text-gray-500 font-bold ml-1 flex items-center gap-1"><FileText size={14} className="text-amber-400" /> VIN (ΠΡΟΑΙΡΕΤΙΚΟ)</label><input value={entryData.vin} onChange={e => setEntryData({ ...entryData, vin: e.target.value.toUpperCase() })} className="w-full bg-[#0a0a0f] border border-[#1a1a25] p-3 rounded-xl text-sm uppercase outline-none focus:border-amber-500/50 transition-colors" placeholder="Αρ. Πλαισίου" /></div>
 
                             <button onClick={() => { if (!entryData.plate) return showStatus('❌ Βάλε πινακίδα!', 'error'); setCurrentServiceId(null); setSelections({}); setExtras({}); setView('service'); }} className="w-full bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-black py-4 rounded-xl font-bold text-lg mt-4 shadow-lg shadow-amber-900/30 active:scale-[0.98] transition-all">ΕΝΑΡΞΗ ΝΕΑΣ</button>
                         </div>

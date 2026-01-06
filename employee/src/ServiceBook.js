@@ -240,7 +240,7 @@ const ServiceBook = () => {
                                             <div className={`mt-4 ${isPrinting ? 'bg-white border-t border-slate-100 flex items-end justify-between gap-4' : ''}`}>
                                                 <div className={isPrinting ? 'flex-1 py-4' : 'p-4 bg-slate-50 border-l-4 border-slate-300 rounded-r-xl text-sm text-slate-600 leading-relaxed italic'}>
                                                     <span className="font-bold text-slate-800 not-italic block mb-1 uppercase tracking-widest text-[10px]">Σημειώσεις / Σχόλια:</span>
-                                                    {srv.generalNotes}
+                                                    {srv.generalNotes?.replace(/\|\s*VIN:.*$/i, '').replace(/VIN:.*$/i, '').trim()}
                                                 </div>
                                                 {isPrinting && visitShop.stampUrl && (
                                                     <div className="shrink-0 pb-2 pr-4">
