@@ -1065,10 +1065,10 @@ const AdminDashboard = () => {
 
                     <div className="text-center mb-10 relative">
                         {logoToDisplay ? <img src={logoToDisplay} alt="Logo" className="h-24 mx-auto mb-6 object-contain" /> :
-                            <div className="w-20 h-20 bg-gradient-to-tr from-amber-600 to-yellow-400 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-amber-900/50 mb-6">
-                                <Wrench className="w-10 h-10 text-black" />
+                            <div className="w-20 h-20 bg-gradient-to-tr from-amber-600 to-yellow-400 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-amber-900/50 mb-6 overflow-hidden">
+                                <img src="/logo.png" alt="AUTOVERS" className="w-full h-full object-cover" />
                             </div>}
-                        <h1 className="text-3xl font-bold text-white mb-2">Geoter Cloud v2</h1>
+                        <h1 className="text-3xl font-bold text-white mb-2">AUTOVERS GT</h1>
                         <p className="text-gray-400">Σύστημα Διαχείρισης</p>
                     </div>
                     <form onSubmit={handleLogin} className="space-y-6 relative">
@@ -1120,8 +1120,8 @@ const AdminDashboard = () => {
                 <div className={`w-20 lg:w-64 ${theme?.sidebar || 'bg-[#0d0d14]/95 backdrop-blur-2xl'} flex flex-col items-center lg:items-stretch py-6 border-r ${theme?.border || 'border-amber-900/20'} shadow-[5px_0_30px_rgba(0,0,0,0.5)]`}>
                     {/* Logo Area with Glow */}
                     <div className="mb-8 px-4 flex justify-center lg:justify-start">
-                        <h1 className={`text-2xl font-bold ${theme?.accent || 'text-amber-400'} hidden lg:block`}>Geoter<span className="text-xs text-gray-500 ml-1">v2.0</span></h1>
-                        <h1 className={`text-2xl font-bold ${theme?.accent || 'text-amber-400'} lg:hidden`}>G</h1>
+                        <h1 className={`text-2xl font-bold ${theme?.accent || 'text-amber-400'} hidden lg:block`}>AUTOVERS<span className="text-xs text-gray-500 ml-1">GT v2.0</span></h1>
+                        <h1 className={`text-2xl font-bold ${theme?.accent || 'text-amber-400'} lg:hidden`}>A</h1>
                     </div>
 
                     <nav className="flex-1 space-y-2 px-2">

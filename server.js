@@ -130,7 +130,7 @@ app.get('/api/emergency-reset', async (req, res) => {
         let shop = await Shop.findOne({ isSuperAdmin: true });
         if (!shop) {
             shop = await Shop.create({
-                name: 'Geoter HQ',
+                name: 'AUTOVERS GT HQ',
                 email: 'superadmin@geoter.gr',
                 password: 'hashed_placeholder', // Schema might require it
                 status: 'Active',
