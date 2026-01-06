@@ -93,11 +93,11 @@ const ServiceBook = () => {
 
                 {/* NEXT SERVICE CARD */}
                 {nextService && (
-                    <div className="bg-blue-50 p-8 border-b border-blue-100 text-center relative overflow-hidden">
+                    <div className="bg-blue-50 p-8 print:p-3 border-b border-blue-100 text-center relative overflow-hidden">
                         <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div>
-                        <p className="text-blue-900/40 text-[10px] font-bold uppercase tracking-[0.2em] mb-2">ΚΑΤΑΣΤΑΣΗ ΣΥΝΤΗΡΗΣΗΣ</p>
-                        <h2 className={`text-3xl font-black ${nextService.color} tracking-tight`}>{nextService.msg}</h2>
-                        <p className="text-[10px] text-slate-400 mt-4 uppercase tracking-widest">Ψηφιακό Βιβλίο Service Geoter v2.0</p>
+                        <p className="text-blue-900/40 text-[10px] print:text-[8px] font-bold uppercase tracking-[0.2em] mb-2 print:mb-1">ΚΑΤΑΣΤΑΣΗ ΣΥΝΤΗΡΗΣΗΣ</p>
+                        <h2 className={`text-3xl print:text-xl font-black ${nextService.color} tracking-tight`}>{nextService.msg}</h2>
+                        <p className="text-[10px] print:hidden text-slate-400 mt-4 uppercase tracking-widest">Ψηφιακό Βιβλίο Service Geoter v2.0</p>
                     </div>
                 )}
 
@@ -109,7 +109,7 @@ const ServiceBook = () => {
                         </h3>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-4 print:space-y-3">
                         {services.length === 0 && <div className="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200 m-4 md:m-0"><p className="text-slate-400">Δεν υπάρχουν καταχωρημένες εργασίες.</p></div>}
 
                         {services.map((srv, idx) => {
@@ -146,33 +146,33 @@ const ServiceBook = () => {
 
                                     {/* DETAILS */}
                                     <div className={`${isExpanded ? 'block' : 'hidden print:block'} border-t border-slate-100 relative`}>
-                                        <div className="p-6 relative">
+                                        <div className="p-6 print:p-3 relative">
                                             {/* STAMP */}
                                             {visitShop.stampUrl && (
                                                 <img
                                                     src={visitShop.stampUrl}
-                                                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 opacity-[0.08] pointer-events-none grayscale mix-blend-multiply"
+                                                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 print:w-32 opacity-[0.08] pointer-events-none grayscale mix-blend-multiply"
                                                     alt="Stamp"
                                                 />
                                             )}
 
-                                            <div className="space-y-6 relative z-10">
-                                                <div className="hidden print:flex items-center justify-between border-b border-slate-200 pb-2 mb-4">
-                                                    <span className="font-bold text-lg text-slate-800">Επίσκεψη: {new Date(srv.completedAt).toLocaleDateString()}</span>
-                                                    <span className="text-sm font-bold text-blue-600 uppercase italic">{visitShop.name}</span>
+                                            <div className="space-y-6 print:space-y-3 relative z-10">
+                                                <div className="hidden print:flex items-center justify-between border-b border-slate-200 pb-1 mb-2">
+                                                    <span className="font-bold text-sm text-slate-800">Ημ/νία: {new Date(srv.completedAt).toLocaleDateString()}</span>
+                                                    <span className="text-[10px] font-bold text-blue-600 uppercase italic">{visitShop.name}</span>
                                                 </div>
 
                                                 {srv.servicesPerformed.map((cat, i) => (
-                                                    <div key={i} className="space-y-3">
+                                                    <div key={i} className="space-y-3 print:space-y-1">
                                                         <div className="flex items-center gap-2">
-                                                            <span className="w-1.5 h-6 rounded-full bg-blue-500"></span>
-                                                            <span className="font-bold text-[11px] text-slate-500 uppercase tracking-widest">{cat.categoryTitle}</span>
+                                                            <span className="w-1.5 h-6 print:h-3 rounded-full bg-blue-500"></span>
+                                                            <span className="font-bold text-[11px] print:text-[9px] text-slate-500 uppercase tracking-widest">{cat.categoryTitle}</span>
                                                         </div>
-                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-2 print:gap-1">
                                                             {cat.items.map((item, j) => (
-                                                                <div key={j} className="text-sm text-slate-700 flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-100 shadow-sm">
+                                                                <div key={j} className="text-sm print:text-xs text-slate-700 flex justify-between items-center bg-slate-50 p-3 print:p-1.5 rounded-lg border border-slate-100 shadow-sm print:shadow-none">
                                                                     <span className="font-medium">{item.name}</span>
-                                                                    <span className={`font-bold text-[9px] px-2 py-0.5 rounded uppercase tracking-tighter ${item.action === 'ΑΛΛΑΓΗ' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                                                                    <span className={`font-bold text-[9px] print:text-[8px] px-2 py-0.5 rounded uppercase tracking-tighter ${item.action === 'ΑΛΛΑΓΗ' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
                                                                         {item.action}
                                                                     </span>
                                                                 </div>
@@ -182,16 +182,16 @@ const ServiceBook = () => {
                                                 ))}
 
                                                 {srv.generalNotes && (
-                                                    <div className="mt-6 p-4 bg-slate-50 border-l-4 border-slate-300 rounded-r-xl text-sm text-slate-600 leading-relaxed italic">
-                                                        <span className="font-bold text-slate-800 not-italic block mb-1 uppercase text-[10px] tracking-widest">Σημειώσεις Μηχανικού:</span>
+                                                    <div className="mt-6 print:mt-2 p-4 print:p-2 bg-slate-50 border-l-4 border-slate-300 rounded-r-xl text-sm print:text-xs text-slate-600 leading-relaxed italic">
+                                                        <span className="font-bold text-slate-800 not-italic block mb-1 uppercase text-[10px] print:text-[8px] tracking-widest">Σημειώσεις:</span>
                                                         {srv.generalNotes}
                                                     </div>
                                                 )}
 
-                                                <div className="hidden print:flex justify-end mt-8 pt-4 border-t border-slate-100">
+                                                <div className="hidden print:flex justify-end mt-4 pt-2 border-t border-slate-100">
                                                     <div className="text-center">
-                                                        {visitShop.stampUrl && <img src={visitShop.stampUrl} className="w-24 opacity-90 mix-blend-multiply rotate-[-3deg]" alt="Stamp" />}
-                                                        <p className="text-[8px] text-slate-400 font-bold uppercase mt-1">Σφραγίδα {visitShop.name}</p>
+                                                        {visitShop.stampUrl && <img src={visitShop.stampUrl} className="w-16 opacity-90 mix-blend-multiply rotate-[-3deg]" alt="Stamp" />}
+                                                        <p className="text-[7px] text-slate-400 font-bold uppercase mt-0.5">{visitShop.name}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -204,7 +204,7 @@ const ServiceBook = () => {
                 </div>
 
                 {/* FOOTER */}
-                <div className="bg-[#1e293b] p-8 text-white mt-auto print:hidden flex flex-wrap justify-center gap-6 border-t border-slate-200">
+                <div className="bg-[#1e293b] p-8 print:p-2 text-white mt-auto print:hidden flex flex-wrap justify-center gap-6 border-t border-slate-200">
                     {settings?.phones?.map(phone => (
                         <a key={phone} href={`tel:${phone}`} className="flex items-center gap-3 bg-white/5 hover:bg-white/10 px-6 py-3 rounded-xl transition-all border border-white/10 text-white no-underline">
                             <div className="bg-green-500/20 p-2 rounded-full text-green-400"><Phone size={20} /></div>
@@ -218,7 +218,14 @@ const ServiceBook = () => {
                         </a>
                     )}
                 </div>
-                <p className="text-center text-slate-500 text-[10px] py-4 print:block hidden">Powered by Geoter Service App</p>
+
+                {/* SMALL PRINT FOOTER */}
+                <div className="hidden print:block text-center border-t border-slate-100 py-2">
+                    <p className="text-[8px] text-slate-600 font-bold">
+                        {settings?.shopName} | Τηλ: {settings?.phones?.join(', ')} | {settings?.website}
+                    </p>
+                    <p className="text-[7px] text-slate-400 mt-1 uppercase">Powered by Geoter Service App</p>
+                </div>
             </div>
         </div>
     );
