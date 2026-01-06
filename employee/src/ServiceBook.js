@@ -181,15 +181,13 @@ const ServiceBook = () => {
                                                 {/* Header for individual visit in PDF */}
                                                 {isPrinting && (
                                                     <div className="flex items-center justify-between border-b border-slate-200 pb-0.5 mb-1.5">
-                                                        <div className="flex items-center gap-3">
+                                                        <div className="flex items-center gap-4">
                                                             <span className="font-bold text-xs text-slate-800 tracking-tight">{new Date(srv.completedAt).toLocaleDateString()}</span>
-                                                            <span className="text-[9px] font-bold text-blue-600 uppercase italic">{visitShop.name}</span>
+                                                            <span className="text-[10px] font-bold text-blue-600 font-mono">
+                                                                {srv.generalNotes?.match(/ΧΛΜ: (\d+)/)?.[0] || ''}
+                                                            </span>
+                                                            <span className="text-[9px] font-bold text-slate-400 uppercase italic pl-2 border-l border-slate-200">{visitShop.name}</span>
                                                         </div>
-                                                        {srv.generalNotes && (
-                                                            <div className="text-[9px] text-slate-500 italic max-w-[200px] truncate">
-                                                                {srv.generalNotes}
-                                                            </div>
-                                                        )}
                                                     </div>
                                                 )}
 
@@ -204,7 +202,7 @@ const ServiceBook = () => {
                                                     />
                                                 )}
 
-                                                <div className={isPrinting ? 'grid grid-cols-1 gap-y-1 w-full' : 'space-y-6'}>
+                                                <div className={isPrinting ? 'grid grid-cols-3 gap-x-4 gap-y-1 w-full' : 'space-y-6'}>
                                                     {srv.servicesPerformed.map((cat, i) => (
                                                         <div key={i} className={`space-y-1 ${isPrinting ? 'border-l-2 border-slate-100 pl-2' : ''}`}>
                                                             {!isPrinting && (
