@@ -402,12 +402,24 @@ const GarageTab = ({ vehicles, refreshVehicles, theme, user }) => {
                 </div >
             )}
 
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4"><h2 className="text-2xl font-bold text-white">🚖 Διαχείριση Στόλου</h2><div className="flex gap-3 w-full md:w-auto"><div className="relative flex-1 md:w-64"><Search className={`absolute left-3 top-1/2 -translate-y-1/2 ${t.text}`} size={18} /><input type="text" placeholder="Αναζήτηση..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={`w-full ${t.input} border ${t.border} text-white pl-10 pr-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none uppercase`} autoComplete="off" /></div><button onClick={(e) => { e.preventDefault(); setShowForm(!showForm); }} className={`${t.button} text-white px-4 py-2 rounded-lg flex gap-2 items-center`}><Plus size={18} /> <span className="hidden md:inline">Νέα Εισαγωγή</span></button></div></div>
-            <AnimatePresence>{showForm && (<motion.form initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} onSubmit={handleAdd} className={`${t.card} p-4 rounded-xl border ${t.border} grid grid-cols-1 md:grid-cols-2 gap-4 overflow-hidden`}><input autoFocus placeholder="Πινακίδα (ΑΒΓ-1234)" value={newCar.plateNumber} onChange={e => handleNewCarInput('plateNumber', e.target.value.toUpperCase())} className={`${t.input} border ${t.border} text-white p-3 rounded-lg w-full font-bold uppercase tracking-wider`} autoComplete="off" /><div className="grid grid-cols-2 gap-2"><input placeholder="Μάρκα" value={newCar.brand} onChange={e => handleNewCarInput('brand', e.target.value)} className={`${t.input} border ${t.border} text-white p-3 rounded-lg`} autoComplete="off" /><input placeholder="Μοντέλο" value={newCar.model} onChange={e => handleNewCarInput('model', e.target.value)} className={`${t.input} border ${t.border} text-white p-3 rounded-lg`} autoComplete="off" /></div><input placeholder="Ονοματεπώνυμο Πελάτη" value={newCar.ownerName} onChange={e => handleNewCarInput('ownerName', e.target.value)} className={`${t.input} border ${t.border} text-white p-3 rounded-lg`} autoComplete="name" /><input placeholder="Τηλέφωνο Επικοινωνίας" value={newCar.ownerPhone} onChange={e => handleNewCarInput('ownerPhone', e.target.value)} className={`${t.input} border ${t.border} text-white p-3 rounded-lg`} autoComplete="tel" /><button type="submit" className="col-span-1 md:col-span-2 bg-green-600 text-white p-3 rounded-lg font-bold hover:bg-green-500 shadow-lg mt-2">Αποθήκευση Οχήματος</button></motion.form>)}</AnimatePresence>
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                    <span className="bg-gradient-to-r from-amber-600 to-yellow-500 p-2 rounded-lg shadow-lg shadow-amber-900/30"><Home size={20} className="text-black" /></span>
+                    Διαχείριση Στόλου
+                </h2>
+                <div className="flex gap-3 w-full md:w-auto">
+                    <div className="relative flex-1 md:w-64">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-400" size={18} />
+                        <input type="text" placeholder="Αναζήτηση..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full bg-[#0a0a0f] border border-amber-900/30 text-white pl-10 pr-4 py-2 rounded-lg focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 outline-none uppercase transition-all" autoComplete="off" />
+                    </div>
+                    <button onClick={(e) => { e.preventDefault(); setShowForm(!showForm); }} className="bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-black px-4 py-2 rounded-lg flex gap-2 items-center font-bold shadow-lg shadow-amber-900/30 transition-all"><Plus size={18} /> <span className="hidden md:inline">Νέα Εισαγωγή</span></button>
+                </div>
+            </div>
+            <AnimatePresence>{showForm && (<motion.form initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} onSubmit={handleAdd} className="bg-[#12121a]/80 backdrop-blur-lg p-4 rounded-xl border border-amber-900/20 grid grid-cols-1 md:grid-cols-2 gap-4 overflow-hidden shadow-2xl"><input autoFocus placeholder="Πινακίδα (ΑΒΓ-1234)" value={newCar.plateNumber} onChange={e => handleNewCarInput('plateNumber', e.target.value.toUpperCase())} className="bg-[#0a0a0f] border border-amber-900/30 text-white p-3 rounded-lg w-full font-bold uppercase tracking-wider focus:border-amber-500/50" autoComplete="off" /><div className="grid grid-cols-2 gap-2"><input placeholder="Μάρκα" value={newCar.brand} onChange={e => handleNewCarInput('brand', e.target.value)} className="bg-[#0a0a0f] border border-amber-900/30 text-white p-3 rounded-lg focus:border-amber-500/50" autoComplete="off" /><input placeholder="Μοντέλο" value={newCar.model} onChange={e => handleNewCarInput('model', e.target.value)} className="bg-[#0a0a0f] border border-amber-900/30 text-white p-3 rounded-lg focus:border-amber-500/50" autoComplete="off" /></div><input placeholder="Ονοματεπώνυμο Πελάτη" value={newCar.ownerName} onChange={e => handleNewCarInput('ownerName', e.target.value)} className="bg-[#0a0a0f] border border-amber-900/30 text-white p-3 rounded-lg focus:border-amber-500/50" autoComplete="name" /><input placeholder="Τηλέφωνο Επικοινωνίας" value={newCar.ownerPhone} onChange={e => handleNewCarInput('ownerPhone', e.target.value)} className="bg-[#0a0a0f] border border-amber-900/30 text-white p-3 rounded-lg focus:border-amber-500/50" autoComplete="tel" /><button type="submit" className="col-span-1 md:col-span-2 bg-gradient-to-r from-emerald-600 to-green-500 text-white p-3 rounded-lg font-bold hover:from-emerald-500 hover:to-green-400 shadow-lg shadow-emerald-900/30 mt-2 transition-all">Αποθήκευση Οχήματος</button></motion.form>)}</AnimatePresence>
 
             {/* LIST VIEW */}
             <div className="flex flex-col gap-4">
-                {filteredVehicles.length === 0 ? (<p className="text-slate-500 text-center py-10">Δεν βρέθηκαν οχήματα.</p>) : (
+                {filteredVehicles.length === 0 ? (<p className="text-gray-500 text-center py-10">Δεν βρέθηκαν οχήματα.</p>) : (
                     filteredVehicles.map((car) => {
                         const lastService = car.latestService;
                         const jobDescription = Array.isArray(lastService?.servicesPerformed)
@@ -415,17 +427,17 @@ const GarageTab = ({ vehicles, refreshVehicles, theme, user }) => {
                             : 'Καμία καταγραφή';
 
                         return (
-                            <motion.div key={car._id} className={`${t.card} border ${t.border} p-0 rounded-xl flex flex-col md:flex-row overflow-hidden hover:border-slate-500 transition-colors`}>
+                            <motion.div key={car._id} className="bg-[#12121a]/80 backdrop-blur-lg border border-amber-900/20 p-0 rounded-xl flex flex-col md:flex-row overflow-hidden hover:border-amber-500/30 transition-all shadow-xl shadow-black/30">
                                 {/* 1. CAR INFO (LEFT) */}
-                                <div className={`p-4 ${t.sidebar} md:w-64 flex flex-col justify-center border-b md:border-b-0 md:border-r ${t.border}`}>
+                                <div className="p-4 bg-[#0d0d14]/80 md:w-64 flex flex-col justify-center border-b md:border-b-0 md:border-r border-amber-900/20">
                                     <div className="flex items-center gap-3 mb-2">
-                                        <div className="bg-blue-600/20 text-blue-400 p-2 rounded-lg"><Wrench size={20} /></div>
-                                        <h3 className="text-xl font-bold text-white tracking-wider">{car.plateNumber}</h3>
+                                        <div className="bg-gradient-to-r from-amber-600 to-yellow-500 p-2 rounded-lg shadow-lg shadow-amber-900/30"><Wrench size={20} className="text-black" /></div>
+                                        <h3 className="text-xl font-bold text-amber-100 tracking-wider">{car.plateNumber}</h3>
                                     </div>
-                                    <p className="text-slate-400 text-sm font-medium">{car.brand} {car.model}</p>
-                                    <div className={`mt-3 pt-3 border-t ${t.border} flex flex-col gap-1 text-xs text-slate-500`}>
-                                        <span className="flex items-center gap-2"><User size={12} /> {car.ownerName || '-'}</span>
-                                        <span className="flex items-center gap-2"><Phone size={12} /> {car.ownerPhone || '-'}</span>
+                                    <p className="text-gray-400 text-sm font-medium">{car.brand} {car.model}</p>
+                                    <div className="mt-3 pt-3 border-t border-amber-900/20 flex flex-col gap-1 text-xs text-gray-500">
+                                        <span className="flex items-center gap-2"><User size={12} className="text-amber-400" /> {car.ownerName || '-'}</span>
+                                        <span className="flex items-center gap-2"><Phone size={12} className="text-amber-400" /> {car.ownerPhone || '-'}</span>
                                     </div>
                                 </div>
 
