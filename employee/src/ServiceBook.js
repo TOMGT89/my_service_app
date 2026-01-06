@@ -1,22 +1,28 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { Phone, Globe, Download, ChevronDown, ChevronUp, AlertTriangle, History, Wrench, FileText } from 'lucide-react';
+import { Phone, Globe, Download, ChevronDown, ChevronUp, History, Wrench, FileText, Loader2 } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 import { API_URL } from './config';
 
-const ServiceBook = () => {
-    const { plate } = useParams();
+const ServiceBook = ({ providedPlate }) => {
+    const { plate: urlPlate } = useParams();
+    const plate = providedPlate || urlPlate;
     const [data, setData] = useState(null);
     const [expandedVisit, setExpandedVisit] = useState(null);
     const [isPrinting, setIsPrinting] = useState(false);
     const contentRef = useRef(null);
 
     useEffect(() => {
-        // API Call to get Full History
-        fetch(`${API_URL}/api/public/book/${plate}`)
-            .then(res => res.json())
-            .then(setData)
-            .catch(err => console.error(err));
+        // API Call to get Full History (Public Route)
+        if (plate) {
+            fetch(`${API_URL}/api/public/book/${plate}`)
+                .then(res => res.json())
+                .then(setData)
+                .catch(err => {
+                    console.error(err);
+                    setData({ error: true });
+                });
+        }
     }, [plate]);
 
     const calculateNextService = () => {
@@ -29,9 +35,10 @@ const ServiceBook = () => {
             )
         );
 
-        if (!lastOilChange) return { msg: 'Προτείνεται Έλεγχος', color: 'text-orange-500' };
+        if (!lastOilChange) return { msg: 'Προτείνεται Έλεγχος', color: 'text-orange-600' };
 
-        const lastKm = parseInt(lastOilChange.generalNotes?.match(/ΧΛΜ: (\d+)/)?.[1] || 0);
+        const lastKmMatch = lastOilChange.generalNotes?.match(/ΧΛΜ: (\d+)/);
+        const lastKm = lastKmMatch ? parseInt(lastKmMatch[1]) : 0;
         const lastDate = new Date(lastOilChange.completedAt);
 
         // Logic: +10,000 km OR 1 Year
@@ -40,15 +47,14 @@ const ServiceBook = () => {
         nextDate.setFullYear(nextDate.getFullYear() + 1);
 
         const today = new Date();
-        const isOverdue = today > nextDate; // Basic date check, could also check mileage if we knew current km
+        const isOverdue = today > nextDate;
 
         return {
             km: nextKm,
             date: nextDate.toLocaleDateString('el-GR'),
             isOverdue,
-            msg: isOverdue ? 'ΕΚΠΡΟΘΕΣΜΟ!' : `Επόμενο: ${nextKm} χλμ ή ${nextDate.toLocaleDateString('el-GR')}`,
-            color: isOverdue ? 'text-red-600' : 'text-green-600',
-            icon: isOverdue ? <AlertTriangle /> : null
+            msg: isOverdue ? 'ΕΚΠΡΟΘΕΣΜΟ!' : `Επόμενο: ${nextKm} χλμ / ${nextDate.toLocaleDateString('el-GR')}`,
+            color: isOverdue ? 'text-red-600' : 'text-green-600'
         };
     };
 
@@ -77,15 +83,21 @@ const ServiceBook = () => {
         }, 1200);
     };
 
-    if (!data) return <div className="p-10 text-center text-white">Φόρτωση...</div>;
-    if (data.error) return <div className="p-10 text-center text-red-500">Το όχημα δεν βρέθηκε.</div>;
+    if (!plate) return <div className="p-10 text-center text-slate-500">Πληκτρολογήστε μια πινακίδα για αναζήτηση...</div>;
+    if (data?.error) return <div className="p-10 text-center text-red-500">Το όχημα {plate} δεν βρέθηκε.</div>;
+    if (!data) return (
+        <div className="p-10 text-center text-slate-400 flex flex-col items-center gap-3">
+            <Loader2 className="animate-spin" size={32} />
+            Φόρτωση βιβλίου...
+        </div>
+    );
 
     const nextService = calculateNextService();
-    const { settings, services, vehicle } = data;
+    const { settings, services } = data;
 
     return (
         <div className="min-h-screen bg-slate-100 p-0 md:p-4 font-sans text-slate-800">
-            <div className={`mx-auto bg-white transition-all ${isPrinting ? 'max-w-none shadow-none' : 'max-w-2xl shadow-2xl md:rounded-2xl overflow-hidden border border-slate-200'}`} ref={contentRef}>
+            <div className="max-w-2xl mx-auto bg-white shadow-2xl md:rounded-2xl overflow-hidden border border-slate-200" ref={contentRef}>
 
                 {/* HEADER */}
                 <div className={`bg-[#1e293b] text-white relative overflow-hidden transition-all ${isPrinting ? 'p-2 flex items-center justify-between gap-4' : 'p-8 text-center'}`}>
@@ -115,9 +127,11 @@ const ServiceBook = () => {
                     </div>
 
                     {!isPrinting && (
-                        <button onClick={handleDownloadPDF} className="absolute top-4 right-4 bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors text-white" title="Λήψη PDF">
-                            <Download size={20} />
-                        </button>
+                        <div className="absolute top-6 right-6 flex gap-2">
+                            <button onClick={handleDownloadPDF} className="bg-white/10 p-2 rounded-xl hover:bg-white/20 transition-colors text-white border border-white/10" title="Λήψη PDF" data-html2canvas-ignore>
+                                <Download size={20} />
+                            </button>
+                        </div>
                     )}
                 </div>
 
@@ -139,9 +153,14 @@ const ServiceBook = () => {
                         </h3>
                     </div>
 
-                    <div className={isPrinting ? 'space-y-3' : 'space-y-4'}>
-                        {services.length === 0 && <div className="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200 m-4 md:m-0"><p className="text-slate-400">Δεν υπάρχουν καταχωρημένες εργασίες.</p></div>}
+                    {services.length === 0 && (
+                        <div className="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200 m-4 md:m-0">
+                            <FileText className="mx-auto text-slate-300 mb-3" size={32} />
+                            <p className="text-slate-400 text-sm">Δεν υπάρχουν καταχωρημένες εργασίες.</p>
+                        </div>
+                    )}
 
+                    <div className={isPrinting ? 'space-y-3' : 'space-y-4'}>
                         {services.map((srv, idx) => {
                             const visitShop = srv.shop || settings;
                             const isExpanded = expandedVisit === srv._id;
@@ -155,7 +174,7 @@ const ServiceBook = () => {
                                     >
                                         <div className="text-left flex items-center gap-4">
                                             <div className={`p-3 rounded-xl ${isExpanded ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-100 text-blue-600'}`}>
-                                                <History size={18} />
+                                                <Wrench size={18} />
                                             </div>
                                             <div>
                                                 <p className="font-bold text-slate-800 text-lg">{new Date(srv.completedAt).toLocaleDateString('el-GR')}</p>
@@ -165,7 +184,9 @@ const ServiceBook = () => {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{visitShop.shopName || visitShop.name}</p>
+                                            <div className="hidden md:block text-right">
+                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{visitShop.shopName || visitShop.name}</p>
+                                            </div>
                                             <div className={`transition-transform duration-300 ${isExpanded ? 'rotate-180 text-blue-600' : 'text-slate-400'}`}>
                                                 <ChevronDown size={20} />
                                             </div>
@@ -180,7 +201,7 @@ const ServiceBook = () => {
                                                 {isPrinting && (
                                                     <div className="flex items-center justify-between border-b border-slate-200 pb-0.5 mb-1.5">
                                                         <div className="flex items-center gap-4">
-                                                            <span className="font-bold text-xs text-slate-800 tracking-tight">{new Date(srv.completedAt).toLocaleDateString()}</span>
+                                                            <span className="font-bold text-xs text-slate-800 tracking-tight">{new Date(srv.completedAt).toLocaleDateString('el-GR')}</span>
                                                             <span className="text-[10px] font-bold text-blue-600 font-mono">
                                                                 {srv.generalNotes?.match(/ΧΛΜ: (\d+)/)?.[0] || ''}
                                                             </span>
@@ -188,8 +209,6 @@ const ServiceBook = () => {
                                                         </div>
                                                     </div>
                                                 )}
-
-                                                {/* STAMP REMOVED FROM TOP-RIGHT */}
 
                                                 {/* BACKGROUND STAMP - HIDDEN IN PRINT */}
                                                 {!isPrinting && visitShop.stampUrl && (
@@ -205,7 +224,7 @@ const ServiceBook = () => {
                                                         <div key={i} className={`space-y-1 ${isPrinting ? 'border-l-2 border-slate-100 pl-2' : ''}`}>
                                                             {!isPrinting && (
                                                                 <div className="flex items-center gap-2">
-                                                                    <span className="rounded-full bg-blue-500 w-1.5 h-6"></span>
+                                                                    <span className="rounded-full bg-blue-500 w-1.5 h-4"></span>
                                                                     <span className="font-bold text-slate-500 uppercase tracking-widest text-[11px]">{cat.categoryTitle}</span>
                                                                 </div>
                                                             )}
@@ -267,18 +286,22 @@ const ServiceBook = () => {
                     </div>
                 </div>
 
-                {/* FOOTER - ONLY VISIBLE ON SCREEN */}
+                {/* FOOTER CONTACT - HIDDEN IN PRINT */}
                 {!isPrinting && (
                     <div className="bg-[#1e293b] border-t border-slate-200 flex flex-wrap justify-center p-8 gap-6 mt-auto">
                         {settings?.phones?.map(phone => (
                             <a key={phone} href={`tel:${phone}`} className="flex items-center gap-3 bg-white/5 hover:bg-white/10 px-6 py-3 rounded-xl transition-all border border-white/10 text-white no-underline">
-                                <div className="bg-green-500/20 p-2 rounded-full text-green-400"><Phone size={20} /></div>
+                                <div className="bg-emerald-500/20 p-2 rounded-full text-emerald-400">
+                                    <Phone size={20} />
+                                </div>
                                 <span className="font-bold tracking-wider">{phone}</span>
                             </a>
                         ))}
                         {settings?.website && (
                             <a href={settings.website} target="_blank" rel="noreferrer" className="flex items-center gap-3 bg-white/5 hover:bg-white/10 px-6 py-3 rounded-xl transition-all border border-white/10 text-white no-underline">
-                                <div className="bg-blue-500/20 p-2 rounded-full text-blue-400"><Globe size={20} /></div>
+                                <div className="bg-blue-500/20 p-2 rounded-full text-blue-400">
+                                    <Globe size={20} />
+                                </div>
                                 <span className="font-bold uppercase tracking-widest">Website</span>
                             </a>
                         )}
