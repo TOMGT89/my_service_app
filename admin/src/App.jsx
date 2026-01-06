@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Wrench, User, LogOut, LayoutDashboard, Users, Wallet, Settings,
     Plus, Trash2, Eye, EyeOff, Upload, Image as ImageIcon, X, Calendar, FileText, CheckCircle, Search, Phone, Pencil, Check, RefreshCw, BarChart2, PieChart, Clock, QrCode,
-    Home, BookOpen, Shield, Smartphone
+    Home, BookOpen, Shield, Smartphone, Globe
 } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 
