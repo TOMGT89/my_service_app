@@ -57,21 +57,22 @@ const ServiceBook = () => {
         setTimeout(() => {
             const element = contentRef.current;
             const opt = {
-                margin: 0.2,
+                margin: 0,
                 filename: `ServiceBook_${plate}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
+                image: { type: 'jpeg', quality: 1 },
                 html2canvas: {
-                    scale: 2,
+                    scale: 3, // High resolution for crystal clear text
                     useCORS: true,
                     logging: false,
-                    letterRendering: true
+                    backgroundColor: '#ffffff'
                 },
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
             };
+
             html2pdf().set(opt).from(element).save().then(() => {
                 setIsPrinting(false);
             });
-        }, 500);
+        }, 800);
     };
 
     if (!data) return <div className="p-10 text-center text-white">Φόρτωση...</div>;
