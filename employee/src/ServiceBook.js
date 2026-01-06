@@ -8,6 +8,7 @@ const ServiceBook = () => {
     const { plate } = useParams();
     const [data, setData] = useState(null);
     const [expandedVisit, setExpandedVisit] = useState(null);
+    const [isPrinting, setIsPrinting] = useState(false);
     const contentRef = useRef(null);
 
     useEffect(() => {
@@ -52,15 +53,25 @@ const ServiceBook = () => {
     };
 
     const handleDownloadPDF = () => {
-        const element = contentRef.current;
-        const opt = {
-            margin: 0, // Zero margin for full bleed look if desired, or standard
-            filename: `ServiceBook_${plate}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true }, // useCORS for external images
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-        html2pdf().set(opt).from(element).save();
+        setIsPrinting(true);
+        setTimeout(() => {
+            const element = contentRef.current;
+            const opt = {
+                margin: 0.2,
+                filename: `ServiceBook_${plate}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    letterRendering: true
+                },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save().then(() => {
+                setIsPrinting(false);
+            });
+        }, 500);
     };
 
     if (!data) return <div className="p-10 text-center text-white">Φόρτωση...</div>;
@@ -74,30 +85,32 @@ const ServiceBook = () => {
             <div className="max-w-2xl mx-auto bg-white shadow-2xl md:rounded-2xl overflow-hidden min-h-screen md:min-h-0 flex flex-col" ref={contentRef}>
 
                 {/* HEADER */}
-                <div className="bg-[#1e293b] p-8 text-center relative overflow-hidden text-white">
+                <div className={`bg-[#1e293b] text-center relative overflow-hidden text-white transition-all ${isPrinting ? 'p-4' : 'p-8'}`}>
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 to-indigo-500"></div>
                     {/* Background Decoration */}
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl -mr-16 -mt-16"></div>
+                    {!isPrinting && <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl -mr-16 -mt-16"></div>}
 
-                    {settings?.logoUrl && <img src={settings.logoUrl} className="h-16 mx-auto mb-4 object-contain filter drop-shadow-md" alt="Logo" />}
-                    <h1 className="text-2xl font-bold uppercase tracking-widest">{settings?.shopName || 'Συνεργείο'}</h1>
+                    {settings?.logoUrl && <img src={settings.logoUrl} className={`mx-auto object-contain filter drop-shadow-md transition-all ${isPrinting ? 'h-12 mb-2' : 'h-16 mb-4'}`} alt="Logo" />}
+                    <h1 className={`font-bold uppercase tracking-widest ${isPrinting ? 'text-xl' : 'text-2xl'}`}>{settings?.shopName || 'Συνεργείο'}</h1>
                     <div className="mt-2 inline-block">
-                        <span className="text-blue-400 text-lg font-mono border border-white/10 px-6 py-1 rounded-lg bg-white/5 backdrop-blur-sm shadow-inner">
+                        <span className={`text-blue-400 font-mono border border-white/10 px-6 py-1 rounded-lg bg-white/5 backdrop-blur-sm shadow-inner ${isPrinting ? 'text-sm' : 'text-lg'}`}>
                             {plate}
                         </span>
                     </div>
-                    <button onClick={handleDownloadPDF} data-html2canvas-ignore className="absolute top-4 right-4 bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors text-white" title="Λήψη PDF">
-                        <Download size={20} />
-                    </button>
+                    {!isPrinting && (
+                        <button onClick={handleDownloadPDF} className="absolute top-4 right-4 bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors text-white" title="Λήψη PDF">
+                            <Download size={20} />
+                        </button>
+                    )}
                 </div>
 
                 {/* NEXT SERVICE CARD */}
                 {nextService && (
-                    <div className="bg-blue-50 p-8 print:p-3 border-b border-blue-100 text-center relative overflow-hidden">
+                    <div className={`bg-blue-50 border-b border-blue-100 text-center relative overflow-hidden transition-all ${isPrinting ? 'p-3' : 'p-8'}`}>
                         <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div>
-                        <p className="text-blue-900/40 text-[10px] print:text-[8px] font-bold uppercase tracking-[0.2em] mb-2 print:mb-1">ΚΑΤΑΣΤΑΣΗ ΣΥΝΤΗΡΗΣΗΣ</p>
-                        <h2 className={`text-3xl print:text-xl font-black ${nextService.color} tracking-tight`}>{nextService.msg}</h2>
-                        <p className="text-[10px] print:hidden text-slate-400 mt-4 uppercase tracking-widest">Ψηφιακό Βιβλίο Service Geoter v2.0</p>
+                        <p className={`text-blue-900/40 font-bold uppercase tracking-[0.2em] mb-2 ${isPrinting ? 'text-[8px] mb-1' : 'text-[10px]'}`}>ΚΑΤΑΣΤΑΣΗ ΣΥΝΤΗΡΗΣΗΣ</p>
+                        <h2 className={`font-black tracking-tight ${nextService.color} ${isPrinting ? 'text-xl' : 'text-3xl'}`}>{nextService.msg}</h2>
+                        {!isPrinting && <p className="text-[10px] text-slate-400 mt-4 uppercase tracking-widest">Ψηφιακό Βιβλίο Service Geoter v2.0</p>}
                     </div>
                 )}
 
@@ -109,7 +122,7 @@ const ServiceBook = () => {
                         </h3>
                     </div>
 
-                    <div className="space-y-4 print:space-y-3">
+                    <div className={isPrinting ? 'space-y-3' : 'space-y-4'}>
                         {services.length === 0 && <div className="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200 m-4 md:m-0"><p className="text-slate-400">Δεν υπάρχουν καταχωρημένες εργασίες.</p></div>}
 
                         {services.map((srv, idx) => {
@@ -145,34 +158,36 @@ const ServiceBook = () => {
                                     </button>
 
                                     {/* DETAILS */}
-                                    <div className={`${isExpanded ? 'block' : 'hidden print:block'} border-t border-slate-100 relative`}>
-                                        <div className="p-6 print:p-3 relative">
+                                    <div className={`${(isExpanded || isPrinting) ? 'block' : 'hidden'} border-t border-slate-100 relative`}>
+                                        <div className={`relative ${isPrinting ? 'p-3' : 'p-6'}`}>
                                             {/* STAMP */}
                                             {visitShop.stampUrl && (
                                                 <img
                                                     src={visitShop.stampUrl}
-                                                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 print:w-32 opacity-[0.08] pointer-events-none grayscale mix-blend-multiply"
+                                                    className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-[0.08] pointer-events-none grayscale mix-blend-multiply ${isPrinting ? 'w-32' : 'w-48'}`}
                                                     alt="Stamp"
                                                 />
                                             )}
 
-                                            <div className="space-y-6 print:space-y-3 relative z-10">
-                                                <div className="hidden print:flex items-center justify-between border-b border-slate-200 pb-1 mb-2">
-                                                    <span className="font-bold text-sm text-slate-800">Ημ/νία: {new Date(srv.completedAt).toLocaleDateString()}</span>
-                                                    <span className="text-[10px] font-bold text-blue-600 uppercase italic">{visitShop.name}</span>
-                                                </div>
+                                            <div className={`relative z-10 ${isPrinting ? 'space-y-3' : 'space-y-6'}`}>
+                                                {isPrinting && (
+                                                    <div className="flex items-center justify-between border-b border-slate-200 pb-1 mb-2">
+                                                        <span className="font-bold text-sm text-slate-800">Ημ/νία: {new Date(srv.completedAt).toLocaleDateString()}</span>
+                                                        <span className="text-[10px] font-bold text-blue-600 uppercase italic">{visitShop.name}</span>
+                                                    </div>
+                                                )}
 
                                                 {srv.servicesPerformed.map((cat, i) => (
-                                                    <div key={i} className="space-y-3 print:space-y-1">
+                                                    <div key={i} className={`space-y-2 ${isPrinting ? 'space-y-1' : 'space-y-2'}`}>
                                                         <div className="flex items-center gap-2">
-                                                            <span className="w-1.5 h-6 print:h-3 rounded-full bg-blue-500"></span>
-                                                            <span className="font-bold text-[11px] print:text-[9px] text-slate-500 uppercase tracking-widest">{cat.categoryTitle}</span>
+                                                            <span className={`rounded-full bg-blue-500 ${isPrinting ? 'w-1 h-3' : 'w-1.5 h-6'}`}></span>
+                                                            <span className={`font-bold text-slate-500 uppercase tracking-widest ${isPrinting ? 'text-[9px]' : 'text-[11px]'}`}>{cat.categoryTitle}</span>
                                                         </div>
-                                                        <div className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-2 print:gap-1">
+                                                        <div className={`grid grid-cols-1 md:grid-cols-2 gap-2 ${isPrinting ? 'grid-cols-2 gap-1' : ''}`}>
                                                             {cat.items.map((item, j) => (
-                                                                <div key={j} className="text-sm print:text-xs text-slate-700 flex justify-between items-center bg-slate-50 p-3 print:p-1.5 rounded-lg border border-slate-100 shadow-sm print:shadow-none">
+                                                                <div key={j} className={`text-slate-700 flex justify-between items-center bg-slate-50 rounded-lg border border-slate-100 transition-all ${isPrinting ? 'text-xs p-1.5 shadow-none' : 'text-sm p-3 shadow-sm'}`}>
                                                                     <span className="font-medium">{item.name}</span>
-                                                                    <span className={`font-bold text-[9px] print:text-[8px] px-2 py-0.5 rounded uppercase tracking-tighter ${item.action === 'ΑΛΛΑΓΗ' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                                                                    <span className={`font-bold rounded uppercase tracking-tighter ${isPrinting ? 'text-[8px] px-1.5' : 'text-[9px] px-2 py-0.5'} ${item.action === 'ΑΛΛΑΓΗ' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
                                                                         {item.action}
                                                                     </span>
                                                                 </div>
@@ -182,18 +197,20 @@ const ServiceBook = () => {
                                                 ))}
 
                                                 {srv.generalNotes && (
-                                                    <div className="mt-6 print:mt-2 p-4 print:p-2 bg-slate-50 border-l-4 border-slate-300 rounded-r-xl text-sm print:text-xs text-slate-600 leading-relaxed italic">
-                                                        <span className="font-bold text-slate-800 not-italic block mb-1 uppercase text-[10px] print:text-[8px] tracking-widest">Σημειώσεις:</span>
+                                                    <div className={`bg-slate-50 border-l-4 border-slate-300 rounded-r-xl text-slate-600 leading-relaxed italic ${isPrinting ? 'mt-2 p-2 text-xs' : 'mt-6 p-4 text-sm'}`}>
+                                                        <span className={`font-bold text-slate-800 not-italic block mb-1 uppercase tracking-widest ${isPrinting ? 'text-[8px]' : 'text-[10px]'}`}>Σημειώσεις:</span>
                                                         {srv.generalNotes}
                                                     </div>
                                                 )}
 
-                                                <div className="hidden print:flex justify-end mt-4 pt-2 border-t border-slate-100">
-                                                    <div className="text-center">
-                                                        {visitShop.stampUrl && <img src={visitShop.stampUrl} className="w-16 opacity-90 mix-blend-multiply rotate-[-3deg]" alt="Stamp" />}
-                                                        <p className="text-[7px] text-slate-400 font-bold uppercase mt-0.5">{visitShop.name}</p>
+                                                {isPrinting && (
+                                                    <div className="flex justify-end mt-4 pt-2 border-t border-slate-100">
+                                                        <div className="text-center">
+                                                            {visitShop.stampUrl && <img src={visitShop.stampUrl} className="w-16 opacity-90 mix-blend-multiply rotate-[-3deg]" alt="Stamp" />}
+                                                            <p className="text-[7px] text-slate-400 font-bold uppercase mt-0.5">{visitShop.name}</p>
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -204,28 +221,30 @@ const ServiceBook = () => {
                 </div>
 
                 {/* FOOTER */}
-                <div className="bg-[#1e293b] p-8 print:p-2 text-white mt-auto print:hidden flex flex-wrap justify-center gap-6 border-t border-slate-200">
+                <div className={`bg-[#1e293b] border-t border-slate-200 flex flex-wrap justify-center mt-auto ${isPrinting ? 'p-2 gap-4' : 'p-8 gap-6 print:hidden'}`}>
                     {settings?.phones?.map(phone => (
-                        <a key={phone} href={`tel:${phone}`} className="flex items-center gap-3 bg-white/5 hover:bg-white/10 px-6 py-3 rounded-xl transition-all border border-white/10 text-white no-underline">
-                            <div className="bg-green-500/20 p-2 rounded-full text-green-400"><Phone size={20} /></div>
-                            <span className="font-bold tracking-wider">{phone}</span>
+                        <a key={phone} href={`tel:${phone}`} className={`flex items-center gap-3 bg-white/5 hover:bg-white/10 rounded-xl transition-all border border-white/10 text-white no-underline ${isPrinting ? 'px-4 py-2' : 'px-6 py-3'}`}>
+                            <div className="bg-green-500/20 p-2 rounded-full text-green-400"><Phone size={isPrinting ? 14 : 20} /></div>
+                            <span className={`font-bold tracking-wider ${isPrinting ? 'text-xs' : ''}`}>{phone}</span>
                         </a>
                     ))}
                     {settings?.website && (
-                        <a href={settings.website} target="_blank" rel="noreferrer" className="flex items-center gap-3 bg-white/5 hover:bg-white/10 px-6 py-3 rounded-xl transition-all border border-white/10 text-white no-underline">
-                            <div className="bg-blue-500/20 p-2 rounded-full text-blue-400"><Globe size={20} /></div>
-                            <span className="font-bold uppercase tracking-widest">Website</span>
+                        <a href={settings.website} target="_blank" rel="noreferrer" className={`flex items-center gap-3 bg-white/5 hover:bg-white/10 rounded-xl transition-all border border-white/10 text-white no-underline ${isPrinting ? 'px-4 py-2' : 'px-6 py-3'}`}>
+                            <div className="bg-blue-500/20 p-2 rounded-full text-blue-400"><Globe size={isPrinting ? 14 : 20} /></div>
+                            <span className={`font-bold uppercase tracking-widest ${isPrinting ? 'text-xs' : ''}`}>Website</span>
                         </a>
                     )}
                 </div>
 
                 {/* SMALL PRINT FOOTER */}
-                <div className="hidden print:block text-center border-t border-slate-100 py-2">
-                    <p className="text-[8px] text-slate-600 font-bold">
-                        {settings?.shopName} | Τηλ: {settings?.phones?.join(', ')} | {settings?.website}
-                    </p>
-                    <p className="text-[7px] text-slate-400 mt-1 uppercase">Powered by Geoter Service App</p>
-                </div>
+                {isPrinting && (
+                    <div className="text-center border-t border-slate-100 py-2">
+                        <p className="text-[8px] text-slate-600 font-bold">
+                            {settings?.shopName} | Τηλ: {settings?.phones?.join(', ')} | {settings?.website}
+                        </p>
+                        <p className="text-[7px] text-slate-400 mt-1 uppercase">Powered by Geoter Service App</p>
+                    </div>
+                )}
             </div>
         </div>
     );
