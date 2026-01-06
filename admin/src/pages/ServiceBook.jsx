@@ -82,7 +82,7 @@ const ServiceBook = ({ providedPlate }) => {
         <div className="min-h-screen bg-slate-100 p-0 md:p-4 font-sans text-slate-800">
             {/* Version Badge for developer verification (Hidden in Print) */}
             <div className="fixed bottom-4 right-4 bg-black/50 text-white text-[8px] px-2 py-1 rounded-full z-50 pointer-events-none" data-html2canvas-ignore>
-                admin-v4.5-sync
+                ADMIN-V4.5-FINAL-SYNC
             </div>
 
             <div className={`mx-auto bg-white transition-all ${isPrinting ? 'max-w-none shadow-none' : 'max-w-2xl shadow-2xl md:rounded-2xl overflow-hidden border border-slate-200'}`} ref={contentRef}>
