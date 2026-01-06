@@ -211,9 +211,9 @@ const ServiceBook = () => {
                                                     />
                                                 )}
 
-                                                <div className={isPrinting ? 'grid grid-cols-2 gap-x-4 gap-y-1 w-3/4' : 'space-y-6'}>
+                                                <div className={isPrinting ? 'grid grid-cols-1 gap-y-1 w-full' : 'space-y-6'}>
                                                     {srv.servicesPerformed.map((cat, i) => (
-                                                        <div key={i} className={`space-y-1 ${isPrinting ? 'col-span-1 border-l-2 border-slate-100 pl-2' : ''}`}>
+                                                        <div key={i} className={`space-y-1 ${isPrinting ? 'border-l-2 border-slate-100 pl-2' : ''}`}>
                                                             {!isPrinting && (
                                                                 <div className="flex items-center gap-2">
                                                                     <span className="rounded-full bg-blue-500 w-1.5 h-6"></span>
@@ -225,26 +225,32 @@ const ServiceBook = () => {
                                                             )}
                                                             <div className={`grid gap-1 ${isPrinting ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 shadow-sm'}`}>
                                                                 {cat.items.map((item, j) => (
-                                                                    <div key={j} className={`text-slate-700 flex justify-between items-start bg-slate-50 border border-slate-100 transition-all ${isPrinting ? 'text-[10px] px-2 pt-[1px] pb-[7px] rounded-sm shadow-none leading-none' : 'text-sm p-3 rounded-lg'}`}>
-                                                                        <span className={`font-medium truncate pr-2 ${isPrinting ? 'mt-[1px]' : ''}`}>{item.name}</span>
-                                                                        <span className={`font-bold rounded uppercase tracking-tighter shrink-0 flex items-center justify-center ${isPrinting ? 'text-[8px] px-2 py-0.5 mt-0' : 'text-[9px] px-2 py-0.5'} ${item.action === 'ΑΛΛΑΓΗ' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
-                                                                            {item.action}
-                                                                        </span>
-                                                                    </div>
+                                                                    isPrinting ? (
+                                                                        <div key={j} className="text-[10px] py-1 text-slate-800 leading-tight border-b border-slate-100/50 last:border-0">
+                                                                            <span className={`font-bold uppercase ${item.action === 'ΑΛΛΑΓΗ' ? 'text-red-700' : 'text-green-700'}`}>{item.action}</span> <span className="font-medium text-slate-700">{item.name}</span>
+                                                                        </div>
+                                                                    ) : (
+                                                                        <div key={j} className="text-slate-700 flex justify-between items-center bg-slate-50 border border-slate-100 transition-all text-sm p-3 rounded-lg">
+                                                                            <span className="font-medium truncate pr-2">{item.name}</span>
+                                                                            <span className={`font-bold rounded uppercase tracking-tighter shrink-0 flex items-center justify-center text-[9px] px-2 py-0.5 ${item.action === 'ΑΛΛΑΓΗ' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                                                                                {item.action}
+                                                                            </span>
+                                                                        </div>
+                                                                    )
                                                                 ))}
                                                             </div>
                                                         </div>
                                                     ))}
                                                 </div>
                                             </div>
-
-                                            {!isPrinting && srv.generalNotes && (
-                                                <div className="mt-6 p-4 bg-slate-50 border-l-4 border-slate-300 rounded-r-xl text-sm text-slate-600 leading-relaxed italic">
-                                                    <span className="font-bold text-slate-800 not-italic block mb-1 uppercase tracking-widest text-[10px]">Σημειώσεις:</span>
-                                                    {srv.generalNotes}
-                                                </div>
-                                            )}
                                         </div>
+
+                                        {srv.generalNotes && (
+                                            <div className={`mt-4 p-4 ${isPrinting ? 'bg-white border-t border-slate-100' : 'bg-slate-50 border-l-4 border-slate-300 rounded-r-xl'} text-sm text-slate-600 leading-relaxed italic`}>
+                                                <span className="font-bold text-slate-800 not-italic block mb-1 uppercase tracking-widest text-[10px]">Σημειώσεις / Σχόλια:</span>
+                                                {srv.generalNotes}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             );
