@@ -109,7 +109,7 @@ const ServiceBook = () => {
                     </div>
 
                     <div className={isPrinting ? 'flex items-center gap-2' : 'mt-2'}>
-                        <span className={`text-blue-400 font-mono border border-white/10 rounded-lg bg-white/5 backdrop-blur-sm shadow-inner transition-all ${isPrinting ? 'text-xs px-3 py-0.5' : 'text-lg px-6 py-1 inline-block'}`}>
+                        <span className={isPrinting ? 'text-blue-400 font-mono font-bold text-[10px]' : 'text-blue-400 font-mono border border-white/10 rounded-lg bg-white/5 backdrop-blur-sm shadow-inner text-lg px-6 py-1 inline-block'}>
                             {plate}
                         </span>
                     </div>
@@ -193,14 +193,7 @@ const ServiceBook = () => {
                                                     </div>
                                                 )}
 
-                                                {/* STAMP POSITIONED TOP-RIGHT IN PRINT */}
-                                                {isPrinting && visitShop.stampUrl && (
-                                                    <img
-                                                        src={visitShop.stampUrl}
-                                                        className="absolute -top-1 right-0 w-16 h-12 object-contain opacity-90 mix-blend-multiply rotate-[-3deg] z-20"
-                                                        alt="Stamp"
-                                                    />
-                                                )}
+                                                {/* STAMP REMOVED FROM TOP-RIGHT */}
 
                                                 {/* BACKGROUND STAMP - HIDDEN IN PRINT */}
                                                 {!isPrinting && visitShop.stampUrl && (
@@ -246,9 +239,29 @@ const ServiceBook = () => {
                                         </div>
 
                                         {srv.generalNotes && (
-                                            <div className={`mt-4 p-4 ${isPrinting ? 'bg-white border-t border-slate-100' : 'bg-slate-50 border-l-4 border-slate-300 rounded-r-xl'} text-sm text-slate-600 leading-relaxed italic`}>
-                                                <span className="font-bold text-slate-800 not-italic block mb-1 uppercase tracking-widest text-[10px]">Σημειώσεις / Σχόλια:</span>
-                                                {srv.generalNotes}
+                                            <div className={`mt-4 ${isPrinting ? 'bg-white border-t border-slate-100 flex items-end justify-between gap-4' : ''}`}>
+                                                <div className={isPrinting ? 'flex-1 py-4' : 'p-4 bg-slate-50 border-l-4 border-slate-300 rounded-r-xl text-sm text-slate-600 leading-relaxed italic'}>
+                                                    <span className="font-bold text-slate-800 not-italic block mb-1 uppercase tracking-widest text-[10px]">Σημειώσεις / Σχόλια:</span>
+                                                    {srv.generalNotes}
+                                                </div>
+                                                {isPrinting && visitShop.stampUrl && (
+                                                    <div className="shrink-0 pb-2 pr-4">
+                                                        <img
+                                                            src={visitShop.stampUrl}
+                                                            className="w-24 h-16 object-contain opacity-90 mix-blend-multiply rotate-[-2deg]"
+                                                            alt="Stamp"
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                        {isPrinting && !srv.generalNotes && visitShop.stampUrl && (
+                                            <div className="mt-4 flex justify-end pr-4 pb-2">
+                                                <img
+                                                    src={visitShop.stampUrl}
+                                                    className="w-24 h-16 object-contain opacity-90 mix-blend-multiply rotate-[-2deg]"
+                                                    alt="Stamp"
+                                                />
                                             </div>
                                         )}
                                     </div>
