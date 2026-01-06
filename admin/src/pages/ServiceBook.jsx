@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Phone, Globe, Download, ChevronDown, ChevronUp, Loader2, History, Wrench, FileText } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import html2pdf from 'html2pdf.js';
+import { API_URL } from '../config';
 
 const ServiceBook = ({ providedPlate }) => {
     const { plate: urlPlate } = useParams();
@@ -15,7 +16,7 @@ const ServiceBook = ({ providedPlate }) => {
     useEffect(() => {
         // Σύνδεση με το Public API
         if (plate) {
-            axios.get(`/api/public/book/${plate}`)
+            axios.get(`${API_URL}/api/public/book/${plate}`)
                 .then(res => setData(res.data))
                 .catch(err => {
                     console.error(err);
@@ -24,7 +25,7 @@ const ServiceBook = ({ providedPlate }) => {
         } else {
             setData(null);
         }
-    }, [plate]);
+    }, [plate, API_URL]);
 
     const calculateNextService = () => {
         if (!data || !data.services) return null;
