@@ -59,7 +59,10 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-// 3. HELPER: PLATE NORMALIZATION (Latin-Only)
+// 3. ANTI-SLEEP PING ENDPOINT
+app.get('/api/ping', (req, res) => res.json({ status: 'alive', time: new Date() }));
+
+// 4. HELPER: PLATE NORMALIZATION (Latin-Only)
 const normalizePlate = (text) => {
     if (!text) return '';
     const greekToLatin = {
