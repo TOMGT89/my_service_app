@@ -272,7 +272,7 @@ const ServiceBook = ({ providedPlate }) => {
                                                     <div className="shrink-0 pb-2 pr-4">
                                                         <img
                                                             src={visitShop.stampUrl}
-                                                            className="w-24 h-16 object-contain opacity-90 mix-blend-multiply rotate-[-2deg]"
+                                                            className="max-w-[120px] max-h-[80px] w-auto h-auto object-contain opacity-90 mix-blend-multiply rotate-[-2deg]"
                                                             alt="Stamp"
                                                         />
                                                     </div>
@@ -283,7 +283,7 @@ const ServiceBook = ({ providedPlate }) => {
                                             <div className="mt-4 flex justify-end pr-4 pb-2">
                                                 <img
                                                     src={visitShop.stampUrl}
-                                                    className="w-24 h-16 object-contain opacity-90 mix-blend-multiply rotate-[-2deg]"
+                                                    className="max-w-[120px] max-h-[80px] w-auto h-auto object-contain opacity-90 mix-blend-multiply rotate-[-2deg]"
                                                     alt="Stamp"
                                                 />
                                             </div>
