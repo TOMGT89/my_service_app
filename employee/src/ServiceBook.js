@@ -85,7 +85,7 @@ const ServiceBook = () => {
 
     return (
         <div className="min-h-screen bg-slate-100 p-0 md:p-4 font-sans text-slate-800">
-            <div className="max-w-2xl mx-auto bg-white shadow-2xl md:rounded-2xl overflow-hidden min-h-screen md:min-h-0 flex flex-col" ref={contentRef}>
+            <div className={`mx-auto bg-white transition-all ${isPrinting ? 'max-w-none shadow-none' : 'max-w-2xl shadow-2xl md:rounded-2xl overflow-hidden border border-slate-200'}`} ref={contentRef}>
 
                 {/* HEADER */}
                 <div className={`bg-[#1e293b] text-white relative overflow-hidden transition-all ${isPrinting ? 'p-2 flex items-center justify-between gap-4' : 'p-8 text-center'}`}>
@@ -132,7 +132,7 @@ const ServiceBook = () => {
                 )}
 
                 {/* HISTORY LIST */}
-                <div className="p-0 md:p-6 flex-1 bg-white">
+                <div className="p-0 md:p-6 space-y-6">
                     <div className="p-4 md:p-0">
                         <h3 className="font-bold text-slate-800 uppercase text-sm tracking-widest flex items-center gap-2">
                             <History size={16} className="text-blue-600" /> Ιστορικό Εργασιών
@@ -165,9 +165,7 @@ const ServiceBook = () => {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            <div className="hidden md:block text-right">
-                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{visitShop.name}</p>
-                                            </div>
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{visitShop.shopName || visitShop.name}</p>
                                             <div className={`transition-transform duration-300 ${isExpanded ? 'rotate-180 text-blue-600' : 'text-slate-400'}`}>
                                                 <ChevronDown size={20} />
                                             </div>
@@ -186,7 +184,7 @@ const ServiceBook = () => {
                                                             <span className="text-[10px] font-bold text-blue-600 font-mono">
                                                                 {srv.generalNotes?.match(/ΧΛΜ: (\d+)/)?.[0] || ''}
                                                             </span>
-                                                            <span className="text-[9px] font-bold text-slate-400 uppercase italic pl-2 border-l border-slate-200">{visitShop.name}</span>
+                                                            <span className="text-[9px] font-bold text-slate-400 uppercase italic pl-2 border-l border-slate-200">{visitShop.shopName || visitShop.name}</span>
                                                         </div>
                                                     </div>
                                                 )}
