@@ -54,17 +54,19 @@ const ServiceBook = () => {
 
     const handleDownloadPDF = () => {
         setIsPrinting(true);
+        // Extended delay for layout stabilization
         setTimeout(() => {
             const element = contentRef.current;
             const opt = {
                 margin: 0,
                 filename: `ServiceBook_${plate}.pdf`,
-                image: { type: 'jpeg', quality: 1 },
+                image: { type: 'jpeg', quality: 1.0 },
                 html2canvas: {
-                    scale: 3, // High resolution for crystal clear text
+                    scale: 3,
                     useCORS: true,
                     logging: false,
-                    backgroundColor: '#ffffff'
+                    backgroundColor: '#ffffff',
+                    windowWidth: 800 // Force stable desktop layout for capture
                 },
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
             };
@@ -72,7 +74,7 @@ const ServiceBook = () => {
             html2pdf().set(opt).from(element).save().then(() => {
                 setIsPrinting(false);
             });
-        }, 800);
+        }, 1200);
     };
 
     if (!data) return <div className="p-10 text-center text-white">Φόρτωση...</div>;
@@ -223,9 +225,9 @@ const ServiceBook = () => {
                                                             )}
                                                             <div className={`grid gap-1 ${isPrinting ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 shadow-sm'}`}>
                                                                 {cat.items.map((item, j) => (
-                                                                    <div key={j} className={`text-slate-700 flex justify-between items-start bg-slate-50 border border-slate-100 transition-all ${isPrinting ? 'text-[9px] px-1 py-1 rounded-sm shadow-none leading-none' : 'text-sm p-3 rounded-lg'}`}>
-                                                                        <span className={`font-medium truncate pr-2 ${isPrinting ? 'pt-0.5' : ''}`}>{item.name}</span>
-                                                                        <span className={`font-bold rounded uppercase tracking-tighter shrink-0 ${isPrinting ? 'text-[7px] px-1 py-0.5 mt-[0.5px]' : 'text-[9px] px-2 py-0.5'} ${item.action === 'ΑΛΛΑΓΗ' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                                                                    <div key={j} className={`text-slate-700 flex justify-between items-center bg-slate-50 border border-slate-100 transition-all ${isPrinting ? 'text-[9px] px-2 h-6 rounded-sm shadow-none' : 'text-sm p-3 rounded-lg'}`}>
+                                                                        <span className="font-medium truncate pr-2">{item.name}</span>
+                                                                        <span className={`font-bold rounded uppercase tracking-tighter shrink-0 flex items-center justify-center ${isPrinting ? 'text-[7px] px-1.5 h-4 mt-0.5' : 'text-[9px] px-2 py-0.5'} ${item.action === 'ΑΛΛΑΓΗ' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
                                                                             {item.action}
                                                                         </span>
                                                                     </div>
