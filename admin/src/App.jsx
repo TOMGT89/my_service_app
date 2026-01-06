@@ -991,6 +991,7 @@ const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('home');
     const [vehicles, setVehicles] = useState([]);
     const [showAppQR, setShowAppQR] = useState(false);
+    const [searchPlate, setSearchPlate] = useState('');
 
     const theme = (user && THEMES[user.theme]) ? THEMES[user.theme] : THEMES['default']; // Robust Fallback
     console.log('DEBUG: User:', user);
@@ -1140,7 +1141,39 @@ const AdminDashboard = () => {
                 <div className={`flex-1 p-8 overflow-y-auto h-screen ${theme?.bg || 'bg-[#080810]'}`}>
                     {activeTab === 'home' && <GarageTab vehicles={vehicles} refreshVehicles={refreshVehicles} theme={theme} user={user} />}
                     {activeTab === 'erp' && <MiniERPTab theme={theme} user={user} />}
-                    {activeTab === 'book' && <div className="h-full bg-slate-900 rounded-xl overflow-hidden border border-slate-700 relative"><ServiceBook /></div>}
+                    {activeTab === 'book' && (
+                        <div className="h-full flex flex-col gap-6">
+                            <div className={`${theme.card} p-6 rounded-2xl border ${theme.border} shadow-xl`}>
+                                <h1 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                                    <span className={`${theme.iconBg} p-2 rounded-lg ${theme.glowShadow}`}><BookOpen size={20} className={theme.iconText} /></span>
+                                    Αναζήτηση & Προεπισκόπηση Service Book
+                                </h1>
+                                <div className="flex gap-4 max-w-md">
+                                    <div className="relative flex-1">
+                                        <Search className={`absolute left-4 top-1/2 -translate-y-1/2 ${theme.accent}`} size={20} />
+                                        <input
+                                            type="text"
+                                            placeholder="Πινακίδα (π.χ. ABC-1234)..."
+                                            value={searchPlate}
+                                            onChange={(e) => setSearchPlate(e.target.value.toUpperCase())}
+                                            className={`w-full ${theme.input} text-white pl-12 pr-4 py-3 rounded-xl focus:ring-2 focus:ring-opacity-50 outline-none uppercase font-bold tracking-widest transition-all`}
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={() => setSearchPlate('')}
+                                        className="bg-gray-800 hover:bg-gray-700 text-gray-400 p-3 rounded-xl border border-gray-700 transition-colors"
+                                        title="Clear"
+                                    >
+                                        Καθαρισμός
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="flex-1 overflow-y-auto rounded-2xl border border-white/5 bg-black/40">
+                                <ServiceBook providedPlate={searchPlate} />
+                            </div>
+                        </div>
+                    )}
                     {activeTab === 'users' && <UsersTab theme={theme} user={user} showStatus={showStatus} />}
                     {activeTab === 'settings' && <SettingsTab user={user} setUser={setUser} theme={theme} showStatus={showStatus} />}
                     {activeTab === 'superadmin' && user.role === 'superadmin' && <SuperAdminTab theme={theme} showStatus={showStatus} />}
