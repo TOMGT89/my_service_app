@@ -92,9 +92,20 @@ const ServiceBook = ({ providedPlate }) => {
                             {plate}
                         </span>
                     </div>
-                    <button onClick={handleDownloadPDF} className="absolute top-6 right-6 bg-white/5 p-2 rounded-xl hover:bg-white/10 transition-colors text-white border border-white/10">
-                        <Download size={20} />
-                    </button>
+                    <div className="absolute top-6 right-6 flex gap-2">
+                        <a
+                            href={`https://peppy-crostata-98bbc1.netlify.app/book/${plate}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="bg-white/5 p-2 rounded-xl hover:bg-white/10 transition-colors text-white border border-white/10"
+                            title="Άνοιγμα Δημόσιας Σελίδας"
+                        >
+                            <Globe size={20} />
+                        </a>
+                        <button onClick={handleDownloadPDF} className="bg-white/5 p-2 rounded-xl hover:bg-white/10 transition-colors text-white border border-white/10" title="Λήψη PDF">
+                            <Download size={20} />
+                        </button>
+                    </div>
                 </div>
 
                 {/* NEXT SERVICE CARD */}

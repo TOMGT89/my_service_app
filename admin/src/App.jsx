@@ -1148,25 +1148,42 @@ const AdminDashboard = () => {
                                     <span className={`${theme.iconBg} p-2 rounded-lg ${theme.glowShadow}`}><BookOpen size={20} className={theme.iconText} /></span>
                                     Αναζήτηση & Προεπισκόπηση Service Book
                                 </h1>
-                                <div className="flex gap-4 max-w-md">
+                                <div className="flex gap-4 max-w-xl">
                                     <div className="relative flex-1">
                                         <Search className={`absolute left-4 top-1/2 -translate-y-1/2 ${theme.accent}`} size={20} />
                                         <input
                                             type="text"
-                                            placeholder="Πινακίδα (π.χ. ABC-1234)..."
+                                            placeholder="Πινακίδα ή URL (π.χ. ABC-1234)..."
                                             value={searchPlate}
-                                            onChange={(e) => setSearchPlate(e.target.value.toUpperCase())}
+                                            onChange={(e) => {
+                                                const val = e.target.value.toUpperCase();
+                                                if (val.includes('/BOOK/')) {
+                                                    const extracted = val.split('/BOOK/')[1]?.split('?')[0];
+                                                    if (extracted) setSearchPlate(extracted);
+                                                    else setSearchPlate(val);
+                                                } else {
+                                                    setSearchPlate(val);
+                                                }
+                                            }}
                                             className={`w-full ${theme.input} text-white pl-12 pr-4 py-3 rounded-xl focus:ring-2 focus:ring-opacity-50 outline-none uppercase font-bold tracking-widest transition-all`}
                                         />
                                     </div>
                                     <button
                                         onClick={() => setSearchPlate('')}
-                                        className="bg-gray-800 hover:bg-gray-700 text-gray-400 p-3 rounded-xl border border-gray-700 transition-colors"
-                                        title="Clear"
+                                        className="bg-gray-800 hover:bg-gray-700 text-gray-400 px-6 py-3 rounded-xl border border-gray-700 transition-colors font-bold"
                                     >
                                         Καθαρισμός
                                     </button>
                                 </div>
+                                {searchPlate && (
+                                    <div className="mt-4 flex items-center gap-2 text-xs text-gray-500 bg-black/20 p-2 rounded-lg border border-white/5">
+                                        <Globe size={14} className="text-amber-500" />
+                                        <span>Δημόσιος Σύνδεσμος: </span>
+                                        <a href={`${PUBLIC_URL}/book/${searchPlate}`} target="_blank" rel="noreferrer" className="text-amber-500 hover:underline font-mono">
+                                            {PUBLIC_URL}/book/{searchPlate}
+                                        </a>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="flex-1 overflow-y-auto rounded-2xl border border-white/5 bg-black/40">
