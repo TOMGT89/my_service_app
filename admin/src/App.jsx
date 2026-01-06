@@ -1034,20 +1034,41 @@ const AdminDashboard = () => {
     if (!user) {
         const logoToDisplay = user?.logoUrl;
         return (
-            <div className="min-h-screen w-full bg-[#0f172a] flex items-center justify-center relative overflow-hidden">
-                <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse delay-1000" />
+            <div className="min-h-screen w-full bg-[#0a0a0f] flex items-center justify-center relative overflow-hidden">
+                {/* Ambient Glow Effects */}
+                <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-amber-600/10 rounded-full blur-[120px] animate-pulse" />
+                <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-amber-500/8 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }} />
 
                 {status && (
-                    <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className={`fixed top-4 left-1/2 -translate-x-1/2 z-[100] p-4 rounded-xl shadow-2xl border ${status.type === 'success' ? 'bg-green-600 border-green-500' : 'bg-red-600 border-red-500'} text-white font-bold flex items-center gap-2`}>
+                    <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className={`fixed top-4 left-1/2 -translate-x-1/2 z-[100] p-4 rounded-xl shadow-2xl border ${status.type === 'success' ? 'bg-gradient-to-r from-emerald-600 to-green-500 border-emerald-400' : 'bg-gradient-to-r from-red-600 to-rose-500 border-red-400'} text-white font-bold flex items-center gap-2`}>
                         {status.type === 'success' ? <CheckCircle /> : <X />}
                         {status.text}
                     </motion.div>
                 )}
 
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md p-8 bg-slate-900/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-2xl relative z-10 mx-4">
-                    <div className="text-center mb-10">{logoToDisplay ? <img src={logoToDisplay} alt="Logo" className="h-24 mx-auto mb-6 object-contain" /> : <div className="w-20 h-20 bg-gradient-to-tr from-blue-500 to-purple-600 rounded-2xl mx-auto flex items-center justify-center shadow-lg mb-6"><Wrench className="w-10 h-10 text-white" /></div>}<h1 className="text-3xl font-bold text-white mb-2">Geoter Cloud v2</h1><p className="text-slate-400">Σύστημα Διαχείρισης</p></div>
-                    <form onSubmit={handleLogin} className="space-y-6"><div className="space-y-2"><label className="text-sm text-slate-300">Username</label><input type="text" className="w-full p-3 bg-slate-800/50 border border-slate-700 rounded-xl text-white outline-none focus:border-blue-500" placeholder="admin" value={credentials.username} onChange={(e) => handleLoginInput('username', e.target.value)} autoComplete="username" /></div><div className="space-y-2"><label className="text-sm text-slate-300">Password</label><input type="password" className="w-full p-3 bg-slate-800/50 border border-slate-700 rounded-xl text-white outline-none focus:border-blue-500" placeholder="••••••••" value={credentials.password} onChange={(e) => handleLoginInput('password', e.target.value)} autoComplete="current-password" /></div><button className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-xl flex justify-center items-center gap-2">Σύνδεση</button></form>
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md p-8 bg-[#12121a]/80 backdrop-blur-2xl border border-amber-900/30 rounded-2xl shadow-2xl shadow-black/50 relative z-10 mx-4">
+                    {/* Gold Glow Border Effect */}
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-amber-500/10 to-transparent opacity-50 pointer-events-none" />
+
+                    <div className="text-center mb-10 relative">
+                        {logoToDisplay ? <img src={logoToDisplay} alt="Logo" className="h-24 mx-auto mb-6 object-contain" /> :
+                            <div className="w-20 h-20 bg-gradient-to-tr from-amber-600 to-yellow-400 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-amber-900/50 mb-6">
+                                <Wrench className="w-10 h-10 text-black" />
+                            </div>}
+                        <h1 className="text-3xl font-bold text-white mb-2">Geoter Cloud v2</h1>
+                        <p className="text-gray-400">Σύστημα Διαχείρισης</p>
+                    </div>
+                    <form onSubmit={handleLogin} className="space-y-6 relative">
+                        <div className="space-y-2">
+                            <label className="text-sm text-gray-400">Username</label>
+                            <input type="text" className="w-full p-3 bg-[#0a0a0f] border border-[#1a1a25] rounded-xl text-white outline-none focus:border-amber-500/50 transition-all" placeholder="admin" value={credentials.username} onChange={(e) => handleLoginInput('username', e.target.value)} autoComplete="username" />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm text-gray-400">Password</label>
+                            <input type="password" className="w-full p-3 bg-[#0a0a0f] border border-[#1a1a25] rounded-xl text-white outline-none focus:border-amber-500/50 transition-all" placeholder="••••••••" value={credentials.password} onChange={(e) => handleLoginInput('password', e.target.value)} autoComplete="current-password" />
+                        </div>
+                        <button className="w-full py-3 bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-black font-bold rounded-xl flex justify-center items-center gap-2 shadow-lg shadow-amber-900/40 transition-all active:scale-[0.98]">Σύνδεση</button>
+                    </form>
                 </motion.div>
             </div>
         );
@@ -1083,27 +1104,28 @@ const AdminDashboard = () => {
                 </AnimatePresence>
 
                 {/* SIDEBAR */}
-                <div className={`w-20 lg:w-64 ${theme?.sidebar || 'bg-slate-800'} flex flex-col items-center lg:items-stretch py-6 border-r ${theme?.border || 'border-slate-700'}`}>
+                <div className={`w-20 lg:w-64 bg-[#0d0d14]/95 backdrop-blur-2xl flex flex-col items-center lg:items-stretch py-6 border-r border-amber-900/20 shadow-[5px_0_30px_rgba(0,0,0,0.5)]`}>
+                    {/* Logo Area with Glow */}
                     <div className="mb-8 px-4 flex justify-center lg:justify-start">
-                        <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent hidden lg:block">Geoter<span className="text-xs text-slate-500 ml-1">v2.0</span></h1>
-                        <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent lg:hidden">G</h1>
+                        <h1 className="text-2xl font-bold bg-gradient-to-r from-amber-400 to-yellow-300 bg-clip-text text-transparent hidden lg:block">Geoter<span className="text-xs text-gray-500 ml-1">v2.0</span></h1>
+                        <h1 className="text-2xl font-bold bg-gradient-to-r from-amber-400 to-yellow-300 bg-clip-text text-transparent lg:hidden">G</h1>
                     </div>
 
                     <nav className="flex-1 space-y-2 px-2">
-                        <button onClick={() => setActiveTab('home')} className={`w-full p-3 rounded-xl flex items-center justify-center lg:justify-start gap-3 transition-all ${activeTab === 'home' ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}><Home size={20} /> <span className="hidden lg:inline font-bold">Στόλος</span></button>
-                        <button onClick={() => setActiveTab('erp')} className={`w-full p-3 rounded-xl flex items-center justify-center lg:justify-start gap-3 transition-all ${activeTab === 'erp' ? 'bg-purple-600 text-white shadow-lg shadow-purple-900/50' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}><Wallet size={20} /> <span className="hidden lg:inline font-bold">Οικονομικά</span></button>
-                        <button onClick={() => setActiveTab('book')} className={`w-full p-3 rounded-xl flex items-center justify-center lg:justify-start gap-3 transition-all ${activeTab === 'book' ? 'bg-orange-600 text-white shadow-lg shadow-orange-900/50' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}><BookOpen size={20} /> <span className="hidden lg:inline font-bold">Service Book</span></button>
-                        <button onClick={() => setActiveTab('users')} className={`w-full p-3 rounded-xl flex items-center justify-center lg:justify-start gap-3 transition-all ${activeTab === 'users' ? 'bg-teal-600 text-white shadow-lg shadow-teal-900/50' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}><Users size={20} /> <span className="hidden lg:inline font-bold">Προσωπικό</span></button>
-                        {user?.role === 'superadmin' && <button onClick={() => setActiveTab('superadmin')} className={`w-full p-3 rounded-xl flex items-center justify-center lg:justify-start gap-3 transition-all ${activeTab === 'superadmin' ? 'bg-red-600 text-white shadow-lg shadow-red-900/50' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}><Shield size={20} /> <span className="hidden lg:inline font-bold">Super Admin</span></button>}
+                        <button onClick={() => setActiveTab('home')} className={`w-full p-3 rounded-xl flex items-center justify-center lg:justify-start gap-3 transition-all ${activeTab === 'home' ? 'bg-gradient-to-r from-amber-600/20 to-transparent border-l-2 border-amber-500 text-amber-400 shadow-lg' : 'text-gray-400 hover:bg-white/5 hover:text-amber-300'}`}><Home size={20} /> <span className="hidden lg:inline font-bold">Στόλος</span></button>
+                        <button onClick={() => setActiveTab('erp')} className={`w-full p-3 rounded-xl flex items-center justify-center lg:justify-start gap-3 transition-all ${activeTab === 'erp' ? 'bg-gradient-to-r from-amber-600/20 to-transparent border-l-2 border-amber-500 text-amber-400 shadow-lg' : 'text-gray-400 hover:bg-white/5 hover:text-amber-300'}`}><Wallet size={20} /> <span className="hidden lg:inline font-bold">Οικονομικά</span></button>
+                        <button onClick={() => setActiveTab('book')} className={`w-full p-3 rounded-xl flex items-center justify-center lg:justify-start gap-3 transition-all ${activeTab === 'book' ? 'bg-gradient-to-r from-amber-600/20 to-transparent border-l-2 border-amber-500 text-amber-400 shadow-lg' : 'text-gray-400 hover:bg-white/5 hover:text-amber-300'}`}><BookOpen size={20} /> <span className="hidden lg:inline font-bold">Service Book</span></button>
+                        <button onClick={() => setActiveTab('users')} className={`w-full p-3 rounded-xl flex items-center justify-center lg:justify-start gap-3 transition-all ${activeTab === 'users' ? 'bg-gradient-to-r from-amber-600/20 to-transparent border-l-2 border-amber-500 text-amber-400 shadow-lg' : 'text-gray-400 hover:bg-white/5 hover:text-amber-300'}`}><Users size={20} /> <span className="hidden lg:inline font-bold">Προσωπικό</span></button>
+                        {user?.role === 'superadmin' && <button onClick={() => setActiveTab('superadmin')} className={`w-full p-3 rounded-xl flex items-center justify-center lg:justify-start gap-3 transition-all ${activeTab === 'superadmin' ? 'bg-gradient-to-r from-red-600/20 to-transparent border-l-2 border-red-500 text-red-400 shadow-lg' : 'text-gray-400 hover:bg-white/5 hover:text-red-300'}`}><Shield size={20} /> <span className="hidden lg:inline font-bold">Super Admin</span></button>}
                     </nav>
 
-                    <div className="px-2 space-y-2">
-                        <button onClick={() => setShowAppQR(true)} className="w-full p-3 rounded-xl flex items-center justify-center lg:justify-start gap-3 transition-all text-slate-400 hover:bg-white/5 hover:text-white"><Smartphone size={20} /> <span className="hidden lg:inline font-bold">Mobile App</span></button>
-                        <button onClick={() => setActiveTab('settings')} className={`w-full p-3 rounded-xl flex items-center justify-center lg:justify-start gap-3 transition-all ${activeTab === 'settings' ? 'bg-slate-600 text-white' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}><Settings size={20} /> <span className="hidden lg:inline font-bold">Ρυθμίσεις</span></button>
+                    <div className="px-2 space-y-2 border-t border-amber-900/20 pt-4">
+                        <button onClick={() => setShowAppQR(true)} className="w-full p-3 rounded-xl flex items-center justify-center lg:justify-start gap-3 transition-all text-gray-400 hover:bg-white/5 hover:text-amber-300"><Smartphone size={20} /> <span className="hidden lg:inline font-bold">Mobile App</span></button>
+                        <button onClick={() => setActiveTab('settings')} className={`w-full p-3 rounded-xl flex items-center justify-center lg:justify-start gap-3 transition-all ${activeTab === 'settings' ? 'bg-gradient-to-r from-amber-600/20 to-transparent border-l-2 border-amber-500 text-amber-400' : 'text-gray-400 hover:bg-white/5 hover:text-amber-300'}`}><Settings size={20} /> <span className="hidden lg:inline font-bold">Ρυθμίσεις</span></button>
                         <button onClick={() => { localStorage.removeItem('user'); localStorage.removeItem('token'); setUser(null); }} className="w-full p-3 rounded-xl flex items-center justify-center lg:justify-start gap-3 text-red-400 hover:bg-red-900/20 transition-all"><LogOut size={20} /> <span className="hidden lg:inline font-bold">Έξοδος</span></button>
                     </div>
                 </div>
-                <div className="flex-1 p-8 overflow-y-auto h-screen bg-black/20">
+                <div className="flex-1 p-8 overflow-y-auto h-screen bg-[#080810]">
                     {activeTab === 'home' && <GarageTab vehicles={vehicles} refreshVehicles={refreshVehicles} theme={theme} user={user} />}
                     {activeTab === 'erp' && <MiniERPTab theme={theme} user={user} />}
                     {activeTab === 'book' && <div className="h-full bg-slate-900 rounded-xl overflow-hidden border border-slate-700 relative"><ServiceBook /></div>}
