@@ -1106,9 +1106,9 @@ const AdminDashboard = () => {
                                 <p className="text-slate-400 text-sm mb-6">Σκανάρετε για εγκατάσταση</p>
 
                                 <div className="bg-white p-4 rounded-xl inline-block mb-6">
-                                    <QRCodeCanvas value={API_URL} size={200} level="H" />
+                                    <QRCodeCanvas value={PUBLIC_URL} size={200} level="H" />
                                 </div>
-                                <p className="text-xs text-slate-500 font-mono mb-6 break-all">{API_URL}</p>
+                                <p className="text-xs text-slate-500 font-mono mb-6 break-all">{PUBLIC_URL}</p>
 
                                 <button onClick={() => setShowAppQR(false)} className="w-full bg-slate-700 hover:bg-slate-600 text-white py-3 rounded-xl font-bold transition-colors">Κλείσιμο</button>
                             </motion.div>
