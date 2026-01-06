@@ -213,30 +213,32 @@ function EmployeeApp() {
     };
 
     if (!user) return (
-        <div className="min-h-screen bg-[#0f172a] flex items-center justify-center p-4 relative">
+        <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4 relative">
             <AnimatePresence>
                 {status && (
-                    <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className={`fixed top-4 left-1/2 -translate-x-1/2 z-[100] p-4 rounded-xl shadow-2xl border ${status.type === 'success' ? 'bg-green-600 border-green-500' : 'bg-red-600 border-red-500'} text-white font-bold flex items-center gap-2 pointer-events-none`}>
+                    <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className={`fixed top-4 left-1/2 -translate-x-1/2 z-[100] p-4 rounded-xl shadow-2xl border ${status.type === 'success' ? 'bg-gradient-to-r from-emerald-600 to-green-500 border-emerald-400' : 'bg-gradient-to-r from-red-600 to-rose-500 border-red-400'} text-white font-bold flex items-center gap-2 pointer-events-none`}>
                         {status.type === 'success' ? <CheckCircle size={20} /> : <Wrench size={20} className="rotate-90" />}
                         {status.text}
                     </motion.div>
                 )}
             </AnimatePresence>
-            <div className="w-full max-w-sm bg-slate-900 p-8 rounded-2xl border border-slate-700 text-center">
-                <Wrench className="text-blue-500 w-12 h-12 mx-auto mb-4" />
+            <div className="w-full max-w-sm bg-[#12121a]/80 backdrop-blur-xl p-8 rounded-2xl border border-amber-900/30 text-center shadow-2xl shadow-black/50">
+                <div className="bg-gradient-to-r from-amber-600 to-yellow-500 w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-amber-900/30">
+                    <Wrench className="text-black w-8 h-8" />
+                </div>
                 <h1 className="text-2xl font-bold text-white mb-6">Service App</h1>
-                <input className="w-full p-3 bg-slate-800 text-white rounded mb-2" placeholder="Username" value={credentials.username} onChange={e => setCredentials({ ...credentials, username: e.target.value })} />
-                <input type="password" className="w-full p-3 bg-slate-800 text-white rounded mb-4" placeholder="Password" value={credentials.password} onChange={e => setCredentials({ ...credentials, password: e.target.value })} />
-                <button onClick={handleLogin} className="w-full bg-blue-600 text-white py-3 rounded font-bold">ΕΙΣΟΔΟΣ</button>
+                <input className="w-full p-3 bg-[#0a0a0f] border border-[#1a1a25] text-white rounded-lg mb-3 focus:border-amber-500/50 focus:outline-none transition-colors" placeholder="Username" value={credentials.username} onChange={e => setCredentials({ ...credentials, username: e.target.value })} />
+                <input type="password" className="w-full p-3 bg-[#0a0a0f] border border-[#1a1a25] text-white rounded-lg mb-5 focus:border-amber-500/50 focus:outline-none transition-colors" placeholder="Password" value={credentials.password} onChange={e => setCredentials({ ...credentials, password: e.target.value })} />
+                <button onClick={handleLogin} className="w-full bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-black py-3 rounded-lg font-bold shadow-lg shadow-amber-900/30 transition-all active:scale-[0.98]">ΕΙΣΟΔΟΣ</button>
             </div>
         </div>
     );
 
     return (
-        <div className="min-h-screen bg-[#0f172a] text-white flex flex-col relative">
+        <div className="min-h-screen bg-[#0a0a0f] text-white flex flex-col relative">
             <AnimatePresence>
                 {status && (
-                    <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className={`fixed top-4 left-1/2 -translate-x-1/2 z-[100] p-4 rounded-xl shadow-2xl border ${status.type === 'success' ? 'bg-green-600 border-green-500' : 'bg-red-600 border-red-500'} text-white font-bold flex items-center gap-2 pointer-events-none`}>
+                    <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className={`fixed top-4 left-1/2 -translate-x-1/2 z-[100] p-4 rounded-xl shadow-2xl border ${status.type === 'success' ? 'bg-gradient-to-r from-emerald-600 to-green-500 border-emerald-400' : 'bg-gradient-to-r from-red-600 to-rose-500 border-red-400'} text-white font-bold flex items-center gap-2 pointer-events-none`}>
                         {status.type === 'success' ? <CheckCircle size={20} /> : <Wrench size={20} className="rotate-90" />}
                         {status.text}
                     </motion.div>
@@ -246,16 +248,16 @@ function EmployeeApp() {
 
 
             {/* HEADER */}
-            <div className="bg-slate-900 p-4 border-b border-slate-800 flex justify-between items-center sticky top-0 z-20 shadow-lg">
-                <div className="flex items-center gap-2"><div className="bg-blue-600/20 p-2 rounded"><Wrench size={20} className="text-blue-400" /></div><span className="font-bold">{user.username}</span></div>
-                <button onClick={() => setUser(null)}><LogOut className="text-red-400" /></button>
+            <div className="bg-[#0d0d14]/90 backdrop-blur-xl p-4 border-b border-amber-900/20 flex justify-between items-center sticky top-0 z-20 shadow-lg shadow-black/30">
+                <div className="flex items-center gap-2"><div className="bg-gradient-to-r from-amber-600 to-yellow-500 p-2 rounded-lg shadow-lg shadow-amber-900/30"><Wrench size={20} className="text-black" /></div><span className="font-bold text-amber-100">{user.username}</span></div>
+                <button onClick={() => setUser(null)} className="p-2 rounded-lg hover:bg-red-900/30 transition-colors"><LogOut className="text-red-400" /></button>
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 pb-24">
                 {view === 'entry' && (
                     <div className="max-w-md mx-auto space-y-8 mt-4">
-                        <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4 shadow-xl">
-                            <h2 className="text-xl font-bold text-center mb-2 flex items-center justify-center gap-2"><Wrench size={20} /> Νέα Εργασία</h2>
+                        <div className="bg-[#12121a]/80 backdrop-blur-lg p-6 rounded-2xl border border-amber-900/20 space-y-4 shadow-2xl shadow-black/30">
+                            <h2 className="text-xl font-bold text-center mb-2 flex items-center justify-center gap-2 text-amber-100"><Wrench size={20} className="text-amber-400" /> Νέα Εργασία</h2>
 
                             {/* ΠΙΝΑΚΙΔΑ */}
                             <div>
@@ -268,25 +270,25 @@ function EmployeeApp() {
                                             if (val.length === 3 && entryData.plate.length === 2) val += '-';
                                             setEntryData({ ...entryData, plate: val })
                                         }}
-                                        className="w-full bg-slate-950 border border-slate-700 py-3 px-2 rounded-xl font-bold text-center text-xl tracking-widest uppercase outline-none focus:border-blue-500 transition-colors"
+                                        className="w-full bg-[#0a0a0f] border border-amber-900/30 py-3 px-2 rounded-xl font-bold text-center text-xl tracking-widest uppercase outline-none focus:border-amber-500/50 transition-colors text-amber-100"
                                         placeholder="ABC-1234"
                                     />
                                 </div>
                             </div>
 
-                            <div><label className="text-xs text-slate-500 font-bold ml-1 flex items-center gap-1"><Clock size={14} /> ΧΙΛΙΟΜΕΤΡΑ</label><input type="number" value={entryData.km} onChange={e => setEntryData({ ...entryData, km: e.target.value })} className="w-full bg-slate-950 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500" placeholder="0" /></div>
-                            <div><label className="text-xs text-slate-500 font-bold ml-1 flex items-center gap-1"><FileText size={14} /> VIN (ΠΡΟΑΙΡΕΤΙΚΟ)</label><input value={entryData.vin} onChange={e => setEntryData({ ...entryData, vin: e.target.value.toUpperCase() })} className="w-full bg-slate-950 border border-slate-700 p-3 rounded-xl text-sm uppercase outline-none focus:border-blue-500" placeholder="Αρ. Πλαισίου" /></div>
+                            <div><label className="text-xs text-gray-500 font-bold ml-1 flex items-center gap-1"><Clock size={14} className="text-amber-400" /> ΧΙΛΙΟΜΕΤΡΑ</label><input type="number" value={entryData.km} onChange={e => setEntryData({ ...entryData, km: e.target.value })} className="w-full bg-[#0a0a0f] border border-[#1a1a25] p-3 rounded-xl outline-none focus:border-amber-500/50 transition-colors" placeholder="0" /></div>
+                            <div><label className="text-xs text-gray-500 font-bold ml-1 flex items-center gap-1"><FileText size={14} className="text-amber-400" /> VIN (ΠΡΟΑΙΡΕΤΙΚΟ)</label><input value={entryData.vin} onChange={e => setEntryData({ ...entryData, vin: e.target.value.toUpperCase() })} className="w-full bg-[#0a0a0f] border border-[#1a1a25] p-3 rounded-xl text-sm uppercase outline-none focus:border-amber-500/50 transition-colors" placeholder="Αρ. Πλαισίου" /></div>
 
-                            <button onClick={() => { if (!entryData.plate) return showStatus('❌ Βάλε πινακίδα!', 'error'); setCurrentServiceId(null); setSelections({}); setExtras({}); setView('service'); }} className="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-bold text-lg mt-4 shadow-lg active:scale-95 transition-transform">ΕΝΑΡΞΗ ΝΕΑΣ</button>
+                            <button onClick={() => { if (!entryData.plate) return showStatus('❌ Βάλε πινακίδα!', 'error'); setCurrentServiceId(null); setSelections({}); setExtras({}); setView('service'); }} className="w-full bg-gradient-to-r from-amber-600 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-black py-4 rounded-xl font-bold text-lg mt-4 shadow-lg shadow-amber-900/30 active:scale-[0.98] transition-all">ΕΝΑΡΞΗ ΝΕΑΣ</button>
                         </div>
 
                         {pendingServices.length > 0 && (
                             <div className="space-y-3">
-                                <h3 className="text-slate-400 font-bold text-sm ml-2 flex items-center gap-2"><History size={16} /> ΣΕ ΑΝΑΜΟΝΗ ({pendingServices.length})</h3>
+                                <h3 className="text-gray-400 font-bold text-sm ml-2 flex items-center gap-2"><History size={16} className="text-amber-400" /> ΣΕ ΑΝΑΜΟΝΗ ({pendingServices.length})</h3>
                                 {pendingServices.map(service => (
-                                    <div key={service._id} onClick={() => handleContinueService(service)} className="bg-slate-800/50 border border-slate-700 p-4 rounded-xl flex justify-between items-center active:bg-slate-800 cursor-pointer">
-                                        <div><h4 className="font-bold text-lg text-white">{service.vehiclePlate}</h4><p className="text-xs text-slate-400">{service.mechanic}</p></div>
-                                        <div className="text-blue-400 bg-blue-900/20 p-2 rounded-full"><RefreshCw size={20} /></div>
+                                    <div key={service._id} onClick={() => handleContinueService(service)} className="bg-[#12121a]/60 backdrop-blur-lg border border-amber-900/20 p-4 rounded-xl flex justify-between items-center active:bg-[#1a1a25] cursor-pointer transition-colors">
+                                        <div><h4 className="font-bold text-lg text-amber-100">{service.vehiclePlate}</h4><p className="text-xs text-gray-400">{service.mechanic}</p></div>
+                                        <div className="text-amber-400 bg-amber-900/20 p-2 rounded-lg"><RefreshCw size={20} /></div>
                                     </div>
                                 ))}
                             </div>
