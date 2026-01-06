@@ -104,13 +104,15 @@ const ServiceBook = ({ providedPlate }) => {
                         {settings?.logoUrl && (
                             <img
                                 src={settings.logoUrl}
-                                className={`object-contain filter drop-shadow-md transition-all ${isPrinting ? 'h-8' : 'h-16 mb-0'}`}
+                                className={`object-contain filter drop-shadow-md transition-all ${isPrinting ? 'h-10' : 'h-16 mb-0'}`}
                                 alt="Logo"
                             />
                         )}
-                        <h1 className={`font-bold uppercase tracking-widest ${isPrinting ? 'text-sm' : 'text-2xl'}`}>
-                            {settings?.shopName || 'Συνεργείο'}
-                        </h1>
+                        {(!isPrinting || !settings?.logoUrl) && (
+                            <h1 className={`font-bold uppercase tracking-widest ${isPrinting ? 'text-sm' : 'text-2xl'}`}>
+                                {settings?.shopName || 'Συνεργείο'}
+                            </h1>
+                        )}
                     </div>
 
                     <div className={isPrinting ? 'flex items-center gap-2' : 'mt-2'}>
@@ -233,7 +235,7 @@ const ServiceBook = ({ providedPlate }) => {
                                                     />
                                                 )}
 
-                                                <div className={isPrinting ? 'grid grid-cols-2 gap-x-4 gap-y-1' : 'space-y-6'}>
+                                                <div className={isPrinting ? 'grid grid-cols-2 gap-x-4 gap-y-1 w-3/4' : 'space-y-6'}>
                                                     {srv.servicesPerformed.map((cat, i) => (
                                                         <div key={i} className={`space-y-1 ${isPrinting ? 'col-span-1 border-l-2 border-slate-100 pl-2' : ''}`}>
                                                             {!isPrinting && (
@@ -274,25 +276,27 @@ const ServiceBook = ({ providedPlate }) => {
                     </div>
                 </div>
 
-                {/* FOOTER CONTACT */}
-                <div className={`bg-[#1e293b] border-t border-slate-200 flex flex-wrap justify-center mt-auto ${isPrinting ? 'p-2 gap-4' : 'p-8 gap-6 print:hidden'}`}>
-                    {settings?.phones?.map(phone => (
-                        <a key={phone} href={`tel:${phone}`} className={`flex items-center gap-3 bg-white/5 hover:bg-white/10 rounded-xl transition-all border border-white/10 text-white no-underline ${isPrinting ? 'px-4 py-2' : 'px-6 py-3'}`}>
-                            <div className="bg-emerald-500/20 p-2 rounded-full text-emerald-400">
-                                <Phone size={isPrinting ? 14 : 20} />
-                            </div>
-                            <span className={`font-bold tracking-wider ${isPrinting ? 'text-xs' : ''}`}>{phone}</span>
-                        </a>
-                    ))}
-                    {settings?.website && (
-                        <a href={settings.website} target="_blank" rel="noreferrer" className={`flex items-center gap-3 bg-white/5 hover:bg-white/10 rounded-xl transition-all border border-white/10 text-white no-underline ${isPrinting ? 'px-4 py-2' : 'px-6 py-3'}`}>
-                            <div className="bg-blue-500/20 p-2 rounded-full text-blue-400">
-                                <Globe size={isPrinting ? 14 : 20} />
-                            </div>
-                            <span className={`font-bold uppercase tracking-widest ${isPrinting ? 'text-xs' : ''}`}>Website</span>
-                        </a>
-                    )}
-                </div>
+                {/* FOOTER CONTACT - HIDDEN IN PRINT */}
+                {!isPrinting && (
+                    <div className="bg-[#1e293b] border-t border-slate-200 flex flex-wrap justify-center p-8 gap-6 mt-auto">
+                        {settings?.phones?.map(phone => (
+                            <a key={phone} href={`tel:${phone}`} className="flex items-center gap-3 bg-white/5 hover:bg-white/10 px-6 py-3 rounded-xl transition-all border border-white/10 text-white no-underline">
+                                <div className="bg-emerald-500/20 p-2 rounded-full text-emerald-400">
+                                    <Phone size={20} />
+                                </div>
+                                <span className="font-bold tracking-wider">{phone}</span>
+                            </a>
+                        ))}
+                        {settings?.website && (
+                            <a href={settings.website} target="_blank" rel="noreferrer" className="flex items-center gap-3 bg-white/5 hover:bg-white/10 px-6 py-3 rounded-xl transition-all border border-white/10 text-white no-underline">
+                                <div className="bg-blue-500/20 p-2 rounded-full text-blue-400">
+                                    <Globe size={20} />
+                                </div>
+                                <span className="font-bold uppercase tracking-widest">Website</span>
+                            </a>
+                        )}
+                    </div>
+                )}
 
                 {/* SMALL PRINT FOOTER */}
                 {isPrinting && (
