@@ -258,6 +258,17 @@ app.delete('/api/admin/shops/:id', authMiddleware, async (req, res) => {
     } catch (e) { res.status(500).json({ error: 'Delete Error' }); }
 });
 
+// EDIT SHOP SUBSCRIPTION (Super Admin)
+app.put('/api/admin/shops/:id', authMiddleware, async (req, res) => {
+    try {
+        if (req.user.role !== 'superadmin') return res.status(403).json({ error: 'Access Denied' });
+        const updatedShop = await Shop.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.json(updatedShop);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
 // SETTINGS (Protected)
 app.put('/api/settings/:userId', upload.fields([{ name: 'logo' }, { name: 'stamp' }]), async (req, res) => {
     try {
@@ -292,7 +303,7 @@ app.put('/api/settings/:userId', upload.fields([{ name: 'logo' }, { name: 'stamp
 });
 
 // USERS (Isolated)
-app.get('/api/users', authMiddleware, async (req, res) => res.json(await User.find({ shop: req.shopId })));
+app.get('/api/users', authMiddleware, async (req, res) => res.json(await User.find({ shop: req.shopId }).select('-password -plainPassword')));
 app.post('/api/users', authMiddleware, async (req, res) => { try { res.json(await User.create({ ...req.body, shop: req.shopId })); } catch (e) { console.error('User Create Error:', e); res.status(500).json({ error: e.message }); } });
 app.put('/api/users/:id', authMiddleware, async (req, res) => { try { res.json(await User.findOneAndUpdate({ _id: req.params.id, shop: req.shopId }, req.body, { new: true })); } catch (e) { res.status(500).json({ error: 'Error' }); } });
 app.delete('/api/users/:id', authMiddleware, async (req, res) => { try { await User.findOneAndDelete({ _id: req.params.id, shop: req.shopId }); res.json({ success: true }); } catch (e) { res.status(500).json({ error: 'Error' }); } });
@@ -437,58 +448,6 @@ app.get(/(.*)/, (req, res) => {
         return res.status(404).send('API endpoint not found');
     }
     res.sendFile(path.join(EMPLOYEE_BUILD_PATH, 'index.html'));
-});
-
-
-// --- SUPER ADMIN ROUTES ---
-
-// 1. GET ALL SHOPS (For Super Admin Dashboard)
-app.get('/api/admin/shops', async (req, res) => {
-    try {
-        const Shop = require('./models/Shop');
-        const shops = await Shop.find().sort({ createdAt: -1 });
-        res.json(shops);
-    } catch (e) {
-        res.status(500).json({ error: e.message });
-    }
-});
-
-// 2. CREATE NEW SHOP (Tenant)
-app.post('/api/admin/shops', async (req, res) => {
-    try {
-        const Shop = require('./models/Shop');
-        const { shopData, adminUser } = req.body;
-
-        // 1. Create Shop
-        const newShop = new Shop(shopData);
-        await newShop.save();
-
-        // 2. Create Admin User for this Shop
-        const newUser = new User({
-            username: adminUser.username,
-            password: adminUser.password, // In real app, hash this!
-            role: 'admin',
-            shop: newShop._id,
-            shopName: newShop.name, // Legacy support
-            theme: newShop.theme
-        });
-        await newUser.save();
-
-        res.json({ success: true, shop: newShop, user: newUser });
-    } catch (e) {
-        res.status(500).json({ error: e.message });
-    }
-});
-
-// 3. EDIT SHOP SUBSCRIPTION
-app.put('/api/admin/shops/:id', async (req, res) => {
-    try {
-        const Shop = require('./models/Shop');
-        const updatedShop = await Shop.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        res.json(updatedShop);
-    } catch (e) {
-        res.status(500).json({ error: e.message });
-    }
 });
 
 // START SERVER
